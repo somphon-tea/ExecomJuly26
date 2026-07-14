@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DV Aging & Discount — H1 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --pink:#FFD6E0; --pink-d:#F8B4C8; --pink-t:#9B2335;
+  --blue:#D6EAFF; --blue-d:#B0D4F8; --blue-t:#1A5A8A;
+  --green:#D6F5E3; --green-d:#A8E6C0; --green-t:#1A6640;
+  --peach:#FFE8D0; --peach-d:#F9C896; --peach-t:#8A3A00;
+  --lav:#EDE0FF; --lav-d:#D4B8F8; --lav-t:#5B2D8E;
+  --bg:#F5F3FF; --card:#FFFFFF; --border:#E8E0F0;
+  --text:#2D2550; --sub:#7A6E90;
+  --shadow:0 2px 20px rgba(80,60,140,.09);
+  --risk-hi:#C0392B; --risk-md:#D4840A; --risk-lo:#1A6640;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans Thai','Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#3A1E6E 0%,#1A4A8A 50%,#0E6B62 100%);padding:20px 32px;color:white}
+.hdr h1{font-size:20px;font-weight:700;letter-spacing:.3px}
+.hdr p{opacity:.8;font-size:12px;margin-top:2px}
+.hdr-note{display:inline-block;background:rgba(255,255,200,.2);border:1px solid rgba(255,255,200,.4);color:#FFE;padding:3px 12px;border-radius:20px;font-size:10px;margin-top:8px}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:#2D2050;padding:0 32px}
+.tab-btn{padding:12px 20px;cursor:pointer;color:rgba(255,255,255,.6);font-weight:600;font-size:13px;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.tab-btn:hover{color:white;background:rgba(255,255,255,.05)}
+.tab-btn.active{color:white;border-bottom-color:#A78BFA}
+
+/* CONTENT */
+.content{padding:20px 28px}
+.panel{display:none}.panel.active{display:block}
+
+/* KPI CARDS */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+.kpi-card{background:var(--card);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);border-top:4px solid;position:relative;overflow:hidden}
+.kpi-branch{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;opacity:.7}
+.kpi-name{font-size:11px;color:var(--sub);margin-bottom:4px}
+.kpi-val{font-size:22px;font-weight:700;margin:4px 0}
+.kpi-sub{font-size:11px;display:flex;align-items:center;gap:4px}
+.kpi-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:var(--shadow);margin-bottom:18px}
+.card-title{font-size:14px;font-weight:700;color:#2D2050;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700}
+.badge-aging{background:var(--pink);color:var(--pink-t)}
+.badge-disc{background:var(--green);color:var(--green-t)}
+.badge-risk{background:#FEE2E2;color:#991B1B}
+
+/* BRANCH COLORS */
+.br-DVRP{background:var(--pink);color:var(--pink-t)}
+.br-DVP{background:var(--blue);color:var(--blue-t)}
+.br-DVK{background:var(--green);color:var(--green-t)}
+.br-DVB{background:var(--peach);color:var(--peach-t)}
+.br-DVRD{background:var(--lav);color:var(--lav-t)}
+.br-Total{background:#F0EBF8;color:#3A2060}
+.pill{display:inline-block;padding:2px 10px;border-radius:12px;font-size:10px;font-weight:700;white-space:nowrap}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{padding:9px 11px;font-weight:700;text-align:right;font-size:11px;white-space:nowrap;position:sticky;top:0;z-index:2;background:#F0EBF8}
+thead th:first-child{text-align:left}
+tbody td{padding:7px 11px;border-top:1px solid var(--border);text-align:right;white-space:nowrap}
+tbody td:first-child{text-align:left}
+tbody tr:hover{background:#F8F5FF}
+.row-total td{border-top:2px solid #C0A8E8;font-weight:700;background:#F8F4FF}
+
+/* HEAT */
+.heat0{color:#BBB}
+.heat1{background:#D6F5E3!important;color:#1A6640}
+.heat2{background:#FFE8B0!important;color:#7A4A00}
+.heat3{background:#FFD0A0!important;color:#7A3000}
+.heat4{background:#FFB0B0!important;color:#8B0000;font-weight:700}
+.bk1{background:#EAF4FF}.bk2{background:#FFFBDC}.bk3{background:#FFE8CC}.bk4{background:#FFD6D6}.bk5{background:#FFBBBB}.bkt{background:#EDE0FF;font-weight:700}
+
+/* TREND */
+.up{color:#C0392B}.dn{color:#0D6E2A}.eq{color:#9090A0}
+.trend-arrow{font-size:14px;font-weight:700}
+
+/* RISK BADGES */
+.risk-hi{background:#FEE2E2;color:#991B1B;border:1px solid #FECACA}
+.risk-md{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
+.risk-lo{background:#D1FAE5;color:#065F46;border:1px solid #A7F3D0}
+
+/* BRANCH SELECTOR BUTTONS */
+.br-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.br-btn{padding:8px 18px;border-radius:24px;cursor:pointer;font-weight:700;font-size:12px;border:2px solid;transition:all .2s;white-space:nowrap}
+.br-btn.DVRP{background:var(--pink);color:var(--pink-t);border-color:var(--pink)}
+.br-btn.DVP{background:var(--blue);color:var(--blue-t);border-color:var(--blue)}
+.br-btn.DVK{background:var(--green);color:var(--green-t);border-color:var(--green)}
+.br-btn.DVB{background:var(--peach);color:var(--peach-t);border-color:var(--peach)}
+.br-btn.DVRD{background:var(--lav);color:var(--lav-t);border-color:var(--lav)}
+.br-btn.active{transform:translateY(-2px);box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.br-btn.DVRP.active{border-color:var(--pink-d)}
+.br-btn.DVP.active{border-color:var(--blue-d)}
+.br-btn.DVK.active{border-color:var(--green-d)}
+.br-btn.DVB.active{border-color:var(--peach-d)}
+.br-btn.DVRD.active{border-color:var(--lav-d)}
+
+/* CONTROLS */
+.ctrl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.ctrl-grp{display:flex;align-items:center;gap:6px}
+.ctrl-lbl{font-size:11px;color:var(--sub);font-weight:600}
+select,button{padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:white;color:var(--text);font-size:12px;cursor:pointer;font-family:inherit}
+button{background:var(--lav);color:var(--lav-t);font-weight:600}
+button:hover{background:var(--lav-d)}
+.btn-active{background:var(--lav-d)!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.1)}
+
+/* CHARTS */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.chart-wrap{background:white;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.chart-title{font-size:12px;font-weight:700;color:#2D2050;margin-bottom:12px}
+
+/* ALERT BANNER */
+.alert-banner{background:linear-gradient(90deg,#FFF3E0,#FFE0E0);border:1px solid #FFCC99;border-radius:12px;padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* SUMMARY STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
+.stat-card{background:white;border-radius:12px;padding:12px;border:1px solid var(--border);text-align:center}
+.stat-val{font-size:20px;font-weight:700;margin:4px 0}
+.stat-lbl{font-size:10px;color:var(--sub)}
+
+/* NA CELL */
+.na-cell{color:#BBB;font-style:italic;text-align:center!important}
+
+@media(max-width:900px){
+  .kpi-row,.stats-grid{grid-template-columns:repeat(3,1fr)}
+  .chart-row{grid-template-columns:1fr}
+  .content{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>DV Aging &amp; Discount Dashboard — H1 2026</h1>
+  <p>Design Village | ราชพฤกษ์ · พุทธมณฑล · เกษตร-นวมินทร์ · บางนา · รัชดา | มกราคม–มิถุนายน 2569</p>
+  <span class="hdr-note">✅ Aging/Discount ระดับสาขา + รายร้านค้า (Shop tab) มิ.ย. 2569 เป็นข้อมูลจริงครบทุกสาขาแล้ว (DVRP/DVP/DVK/DVB/DVRD) | DVK: ยอดสาขารวม (2.585M) ไม่รวมร้าน "The Fitness" 364,645 บาท ซึ่งไฟล์ต้นทางไม่รวมไว้ในยอดรวม (ดูรายละเอียดใน Shop tab) | เม.ย. DVB ไม่มีข้อมูลรายร้าน</span>
+</div>
+
+<div class="tabs">
+  <div class="tab-btn active" onclick="switchTab('overview',this)">ภาพรวม</div>
+  <div class="tab-btn" onclick="switchTab('branch',this)">รายสาขา</div>
+  <div class="tab-btn" onclick="switchTab('shop',this)">รายร้านค้า</div>
+  <div class="tab-btn" onclick="switchTab('discount',this)">Discount</div>
+  <div class="tab-btn" onclick="switchTab('revenue',this)">Revenue</div>
+  <div class="tab-btn" onclick="switchTab('installment',this)">ตารางผ่อนชำระ</div>
+</div>
+
+<div class="content">
+
+<!-- ══════════ TAB 1: OVERVIEW ══════════ -->
+<div id="panel-overview" class="panel active">
+  <div id="kpi-overview" class="kpi-row"></div>
+  <div class="chart-row">
+    <div class="chart-wrap">
+      <div class="chart-title">หนี้คงค้างรวมทุกสาขา รายเดือน (฿ล้าน)</div>
+      <canvas id="c-overview-line" height="200"></canvas>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">เปรียบเทียบหนี้รายสาขา รายเดือน (฿ล้าน)</div>
+      <canvas id="c-overview-stack" height="200"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">
+      <span class="badge badge-aging">Aging</span>
+      ตารางเปรียบเทียบหนี้คงค้าง — รายสาขา × รายเดือน (฿)
+    </div>
+    <div class="tbl-wrap"><table id="tbl-overview"><thead>
+      <tr>
+        <th style="text-align:left">สาขา</th>
+        <th>ม.ค.</th><th>ก.พ.</th><th>มี.ค.</th><th>เม.ย.</th><th>พ.ค.</th><th>มิ.ย.</th>
+        <th>Peak</th><th>MoM พ.ค.→มิ.ย.</th><th>เปลี่ยน ม.ค.→มิ.ย.</th>
+      </tr>
+    </thead><tbody id="tbody-overview"></tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="badge badge-aging">Aging</span> สัดส่วน Aging Bucket รวมทุกสาขา รายเดือน</div>
+    <canvas id="c-overview-bucket" height="130"></canvas>
+  </div>
+</div>
+
+<!-- ══════════ TAB 2: PER BRANCH ══════════ -->
+<div id="panel-branch" class="panel">
+  <div class="br-btns" id="branch-btns">
+    <button class="br-btn DVRP active" onclick="switchBranch('DVRP',this)">DVRP ราชพฤกษ์</button>
+    <button class="br-btn DVP" onclick="switchBranch('DVP',this)">DVP พุทธมณฑล</button>
+    <button class="br-btn DVK" onclick="switchBranch('DVK',this)">DVK เกษตร-นวมินทร์</button>
+    <button class="br-btn DVB" onclick="switchBranch('DVB',this)">DVB บางนา</button>
+    <button class="br-btn DVRD" onclick="switchBranch('DVRD',this)">DVRD รัชดา</button>
+  </div>
+  <div class="chart-row">
+    <div class="chart-wrap">
+      <div class="chart-title" id="branch-chart-title">Aging Bucket — DVRP</div>
+      <canvas id="c-branch-bucket" height="220"></canvas>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title" id="branch-trend-title">หนี้คงค้างรวม — DVRP</div>
+      <canvas id="c-branch-total" height="220"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" id="branch-tbl-title"><span class="badge badge-aging">Aging</span> รายละเอียด Bucket รายเดือน — DVRP</div>
+    <div class="tbl-wrap"><table><thead>
+      <tr>
+        <th style="text-align:left">Bucket</th>
+        <th>ม.ค.</th><th>ก.พ.</th><th>มี.ค.</th><th>เม.ย.</th><th>พ.ค.</th><th>มิ.ย.</th>
+        <th>เปลี่ยน ม.ค.→มิ.ย.</th>
+      </tr>
+    </thead><tbody id="tbody-branch-bucket"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ══════════ TAB 3: SHOP DETAIL ══════════ -->
+<div id="panel-shop" class="panel">
+  <div class="br-btns">
+    <button class="br-btn DVRP active" onclick="switchShopBranch('DVRP',this)">DVRP ราชพฤกษ์</button>
+    <button class="br-btn DVP" onclick="switchShopBranch('DVP',this)">DVP พุทธมณฑล</button>
+    <button class="br-btn DVK" onclick="switchShopBranch('DVK',this)">DVK เกษตร-นวมินทร์</button>
+    <button class="br-btn DVB" onclick="switchShopBranch('DVB',this)">DVB บางนา</button>
+    <button class="br-btn DVRD" onclick="switchShopBranch('DVRD',this)">DVRD รัชดา</button>
+  </div>
+  <div id="shop-stats" class="stats-grid"></div>
+  <div id="shop-alert" class="alert-banner" style="display:none">
+    <span style="font-size:18px">⚠️</span>
+    <span id="shop-alert-text" style="font-weight:700;color:#8B3A00;font-size:13px"></span>
+    <button onclick="setShopFilter('unpaid')" style="margin-left:auto;background:#FF8C42;color:white;border:none;border-radius:8px;padding:4px 12px;font-size:11px">ดูเฉพาะร้านไม่นัดชำระ</button>
+    <button onclick="setShopFilter('all')" style="background:#E8E0F0;color:#5B2D8E;border:none;border-radius:8px;padding:4px 12px;font-size:11px">ดูทั้งหมด</button>
+  </div>
+  <div class="ctrl-row">
+    <div class="ctrl-grp"><span class="ctrl-lbl">ความเสี่ยง:</span>
+      <select id="shop-risk-filter" onchange="renderShopTable()">
+        <option value="all">ทั้งหมด</option>
+        <option value="high">🔴 ความเสี่ยงสูง</option>
+        <option value="medium">🟡 เฝ้าระวัง</option>
+        <option value="low">🟢 ปกติ</option>
+      </select>
+    </div>
+    <div class="ctrl-grp"><span class="ctrl-lbl">เรียง:</span>
+      <select id="shop-sort" onchange="renderShopTable()">
+        <option value="risk">ความเสี่ยงสูงก่อน</option>
+        <option value="unpaid">ยังไม่นัดชำระก่อน</option>
+        <option value="total-desc">หนี้รวมมากสุด</option>
+        <option value="may-desc">มิ.ย.มาก→น้อย</option>
+        <option value="trend-up">เพิ่มขึ้นมากสุด</option>
+        <option value="name">ชื่อร้าน</option>
+      </select>
+    </div>
+    <span id="shop-count" style="margin-left:auto;font-size:11px;color:var(--sub)"></span>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="badge badge-aging">Aging</span> <span id="shop-tbl-title">หนี้คงค้างรายร้านค้า</span> — เปรียบเทียบรายเดือน (฿)</div>
+    <div class="tbl-wrap"><table id="tbl-shop">
+      <thead><tr>
+        <th style="text-align:left;min-width:130px">ร้านค้า</th>
+        <th style="text-align:left;min-width:80px">บริษัท</th>
+        <th style="text-align:center">ความเสี่ยง</th>
+        <th>ม.ค.</th><th>ก.พ.</th><th>มี.ค.</th><th>เม.ย.</th><th>พ.ค.</th><th>มิ.ย.</th>
+        <th>Trend</th><th>% เปลี่ยน</th>
+      </tr></thead>
+      <tbody id="tbody-shop"></tbody>
+    </table></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="badge badge-aging">Aging</span> <span id="shop-chart-title">Trend รายร้าน</span></div>
+    <canvas id="c-shop-trend" height="180"></canvas>
+  </div>
+</div>
+
+<!-- ══════════ TAB 4: DISCOUNT ══════════ -->
+<div id="panel-discount" class="panel">
+  <div class="kpi-row" id="kpi-discount"></div>
+  <div class="chart-row">
+    <div class="chart-wrap">
+      <div class="chart-title">Actual Discount รายเดือน รายสาขา (฿)</div>
+      <canvas id="c-disc-bar" height="200"></canvas>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Actual vs Budget Discount (สะสม YTD)</div>
+      <canvas id="c-disc-line" height="200"></canvas>
+    </div>
+  </div>
+  <div class="ctrl-row">
+    <div class="ctrl-grp"><span class="ctrl-lbl">มุมมอง:</span>
+      <button id="btn-disc-actual" class="btn-active" onclick="setDiscView('actual')">Actual รายเดือน</button>
+      <button id="btn-disc-budget" onclick="setDiscView('budget')">Budget vs Actual</button>
+    </div>
+  </div>
+  <div class="card" id="card-disc-actual">
+    <div class="card-title"><span class="badge badge-disc">Discount</span> Actual Discount รายสาขา × รายเดือน (฿)</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th style="text-align:left">สาขา</th>
+        <th>BG Revenue 2026</th>
+        <th>ม.ค.</th><th>ก.พ.</th><th>มี.ค.</th><th>เม.ย.</th><th>พ.ค.</th><th>มิ.ย.</th>
+        <th>YTD รวม</th><th>% of BG Rev</th>
+      </tr></thead>
+      <tbody id="tbody-disc-actual"></tbody>
+    </table></div>
+  </div>
+  <div class="card" id="card-disc-budget" style="display:none">
+    <div class="card-title"><span class="badge badge-disc">Discount</span> Budget vs Actual vs Balance (฿)</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th style="text-align:left">สาขา</th>
+        <th>BG Revenue 2026</th>
+        <th>Budget YTD มิ.ย.</th>
+        <th>Actual YTD มิ.ย.</th>
+        <th>Balance</th>
+        <th>Actual/BG Rev %</th>
+      </tr></thead>
+      <tbody id="tbody-disc-budget"></tbody>
+    </table></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="badge badge-disc">Discount</span> หมายเหตุ DVRD</div>
+    <p style="font-size:12px;color:var(--sub);line-height:1.8">DVRD (รัชดา) มีส่วนลดสูงสุดในทุกสาขา สัดส่วน Actual YTD (ม.ค.–มิ.ย.) ~7.6% ของ BG Revenue · DVRD Excel totals อาจสูงกว่า Slide ~16–20% เนื่องจากวันที่ Compile ต่างกัน</p>
+  </div>
+</div>
+
+<!-- ══════════ TAB: REVENUE (รายได้หลังหักส่วนลด) ══════════ -->
+<div id="panel-revenue" class="panel">
+  <div id="kpi-revenue" class="kpi-row"></div>
+  <div class="chart-row">
+    <div class="chart-wrap" style="flex:1 1 100%">
+      <div class="chart-title">รายได้หลังหักส่วนลด รายสาขา × รายเดือน (฿)</div>
+      <canvas id="c-rev-bar" height="110"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="badge badge-disc">Revenue</span> รายได้รวมหลังหักส่วนลด (รวม รายได้) รายสาขา × รายเดือน (฿)</div>
+    <p style="font-size:11.5px;color:var(--sub);line-height:1.7;margin-bottom:12px">
+      ข้อมูลจาก DV Summary P&amp;L_June 2026.xlsx แถว "รวม รายได้" ต่อสาขา (รายได้ค่าเช่า+ค่าบริการ+CL+รายได้อื่น
+      หักด้วยส่วนลด/โปรโมชั่น) แสดงเฉพาะฝั่งรายได้ ไม่รวมค่าใช้จ่ายบริหาร/ค่าใช้จ่ายอื่นตามที่ระบุ
+    </p>
+    <div class="tbl-wrap"><table id="tbl-revenue">
+      <thead><tr>
+        <th style="text-align:left">สาขา</th>
+        <th>ม.ค.</th><th>ก.พ.</th><th>มี.ค.</th><th>เม.ย.</th><th>พ.ค.</th><th>มิ.ย.</th>
+        <th>รวม H1</th><th>สัดส่วน</th>
+      </tr></thead>
+      <tbody id="tbody-revenue"></tbody>
+    </table></div>
+    <p style="font-size:11px;color:#DC2626;margin-top:10px">⚠ DVRD: ยอดเดือนมิ.ย. เท่ากับยอด พ.ค. ทุกรายการเป๊ะ (รายได้ค่าเช่า/CL/ส่วนลด) — ตรวจสอบแล้วทั้งไฟล์ Excel และ PPTX หน้า 61 ตรงกัน ยืนยันว่าไฟล์ P&amp;L สาขานี้ยังไม่ได้อัปเดตข้อมูลจริงของเดือนมิ.ย. (ไม่ใช่ปัญหาไฟล์ไม่ sync) ควรตรวจทานกับทีมบัญชีอีกครั้ง</p>
+    <p style="font-size:11px;color:#7A6E90;margin-top:6px">ℹ DVRP/DVP: เดือนมิ.ย. มีรายได้พิเศษที่ไม่ใช่รายได้ประจำ — DVRP รายได้ภาษีที่ดินและป้าย รวม 151,441 บาท / DVP รวม 1,614,036 บาท ซึ่ง PPTX (หน้า 56-61) ไม่รวมยอดนี้ไว้ใน "รวม รายได้" หลัก (ให้ยอดรวมทุกสาขาตรงกับยอด Overall เป๊ะ) ตารางนี้จึงตัดรายการพิเศษนี้ออกเช่นกัน เพื่อให้ตัวเลขรายเดือนเทียบกันได้และรวมยอดตรงกับ Overall</p>
+  </div>
+</div>
+
+<!-- ══════════ TAB 5: INSTALLMENT SCHEDULE (ตารางผ่อนชำระ) ══════════ -->
+<div id="panel-installment" class="panel">
+  <div class="card">
+    <div class="card-title">
+      <span class="badge badge-aging">ตารางผ่อนชำระ</span>
+      แผนผ่อนชำระหนี้เก่า (2025) รายร้านค้าที่มีข้อตกลงพิเศษ — DVK &amp; DVRD
+    </div>
+    <p style="font-size:11.5px;color:var(--sub);line-height:1.7;margin-bottom:12px">
+      ข้อมูลจาก Property Business Presentation June 2026 (หน้า 100–103) เป็นแผน/ข้อตกลงผ่อนชำระหนี้เก่าปี 2025
+      ของร้านค้าที่เจรจาตกลงพิเศษ ซึ่งเป็นมุมมองคนละชุดกับตาราง Aging ในแท็บ "รายร้านค้า" (ที่แสดงยอดหนี้คงค้าง ณ สิ้นเดือน
+      ตาม aging bucket) — ยอด "รวมหนี้เก่า" ในตารางนี้จึงอาจไม่เท่ากับยอดหนี้คงค้างในแท็บรายร้านค้าโดยตรง เก็บไว้แยกกัน
+      เพื่อไม่กระทบยอด Aging หลักที่ใช้รายงาน Executive
+    </p>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>ลำดับ</th><th style="text-align:left">สาขา</th><th style="text-align:left">ร้านค้า</th>
+        <th style="text-align:left">รายละเอียดการผ่อนชำระ (หนี้เก่า 2025)</th>
+        <th>ระยะเวลา</th><th>รวมหนี้เก่า (บาท)</th>
+      </tr></thead>
+      <tbody>
+      <tr>
+        <td style="text-align:center">1</td>
+        <td><span style="background:#D6F5E3;color:#1A6640;padding:2px 8px;border-radius:8px;font-weight:700;font-size:11px">DVK / DVB</span></td>
+        <td style="font-weight:600">Fiorenzo</td>
+        <td style="font-size:11.5px;line-height:1.6"><b>1 Apr 26</b> 100,000.00 <span style='color:var(--sub)'>ค่าบริการพื้นที่ สาขา DVK</span><br><b>1 May 26</b> 50,000.00 <span style='color:var(--sub)'>ค่าบริการพื้นที่ สาขา DVB</span><br><b>1 Jun 26</b> 50,000.00 <span style='color:var(--sub)'>ค่าบริการพื้นที่ สาขา DVB</span><br><b>1 Jul 26</b> 50,000.00 <span style='color:var(--sub)'>ค่าบริการพื้นที่ สาขา DVB</span><br><b>1 Aug 26</b> 50,000.00 <span style='color:var(--sub)'>ค่าบริการพื้นที่ สาขา DVB</span></td>
+        <td style="text-align:center">5 เดือน</td>
+        <td style="text-align:right;font-weight:700">300,000.00 บาท<div style='color:#DC2626;font-size:11px;margin-top:4px'>* ติดต่อร้านค้าไม่ได้ ไม่มีการตอบรับการชำระ</div></td>
+      </tr>
+      <tr>
+        <td style="text-align:center">2</td>
+        <td><span style="background:#D6F5E3;color:#1A6640;padding:2px 8px;border-radius:8px;font-weight:700;font-size:11px">DVK</span></td>
+        <td style="font-weight:600">Red Panda</td>
+        <td style="font-size:11.5px;line-height:1.6"><b>12 Apr 26</b> 193,828.50 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง ธ.ค.68-ม.ค.69</span><br><b>12 May 26</b> 262,562.60 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง ก.พ.-มี.ค.69</span></td>
+        <td style="text-align:center">2 เดือน</td>
+        <td style="text-align:right;font-weight:700">456,391.10 บาท<div style='color:#DC2626;font-size:11px;margin-top:4px'>* ร้านค้าจ่ายเช็ค 2 งวด</div></td>
+      </tr>
+      <tr>
+        <td style="text-align:center">3</td>
+        <td><span style="background:#EDE0FF;color:#5B2D8E;padding:2px 8px;border-radius:8px;font-weight:700;font-size:11px">DVRD</span></td>
+        <td style="font-weight:600">Hey Coffee</td>
+        <td style="font-size:11.5px;line-height:1.6"><b>5 Feb 26</b> 75,627.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 01/25</span><br><b>5 Mar 26</b> 75,627.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 02/25</span><br><b>15 Apr 26</b> 75,627.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 03/25</span><br><b>5 May 26</b> 75,627.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 04/25</span><br><b>5 Jun 26</b> 75,627.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 05/25</span><br><b>5 Jul 26</b> 75,627.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 06/25</span><br><b>5 Aug 26</b> 75,627.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 07/25</span><br><b>5 Sep 26</b> 75,627.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 08/25</span><br><b>5 Oct 26</b> 75,627.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 09/25</span><br><b>5 Nov 26</b> 75,627.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 10/25</span></td>
+        <td style="text-align:center">10 เดือน</td>
+        <td style="text-align:right;font-weight:700">756,270.00 บาท<div style='color:#7A6E90;font-size:11px;margin-top:4px'>* หนี้เก่า ม.ค.68 - ม.ค.69</div></td>
+      </tr>
+      <tr>
+        <td style="text-align:center">4</td>
+        <td><span style="background:#EDE0FF;color:#5B2D8E;padding:2px 8px;border-radius:8px;font-weight:700;font-size:11px">DVRD</span></td>
+        <td style="font-weight:600">ก๋วยเตี๋ยวเรือวัดไทร</td>
+        <td style="font-size:11.5px;line-height:1.6"><b>5 Mar 26</b> 159,751.20 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 12/24-2/25</span><br><b>5 Apr 26</b> 159,751.20 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 3-5/25</span><br><b>5 May 26</b> 159,751.20 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 6-8/25</span><br><b>5 Jun 26</b> 102,718.64 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 9-10/25</span><br><b>5 Jul 26</b> 167,187.41 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 11-12/25</span><br><b>5 Aug 26</b> 129,663.12 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 1-2/26</span></td>
+        <td style="text-align:center">6 เดือน</td>
+        <td style="text-align:right;font-weight:700">878,822.77 บาท</td>
+      </tr>
+      <tr>
+        <td style="text-align:center">5</td>
+        <td><span style="background:#EDE0FF;color:#5B2D8E;padding:2px 8px;border-radius:8px;font-weight:700;font-size:11px">DVRD</span></td>
+        <td style="font-weight:600">ลิ้มเหล่าโหงว</td>
+        <td style="font-size:11.5px;line-height:1.6"><b>20 Mar 26</b> 60,123.90 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 05/25</span><br><b>10 Apr 26</b> 60,444.36 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 06/25</span><br><b>10 May 26</b> 60,444.36 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 07/25</span><br><b>11 Jun 26</b> 60,444.36 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 08/25</span><br><b>10 Jul 26</b> 60,123.90 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 09/25</span><br><b>10 Aug 26</b> 97,230.15 <span style='color:var(--sub)'>ค่าใช้จ่ายอื่นๆ</span><br><b>10 Sep 26</b> 60,364.75 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 10/25</span><br><b>10 Oct 26</b> 77,291.90 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 11/25</span><br><b>10 Nov 26</b> 77,291.90 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 01/26</span><br><b>10 Dec 26</b> 77,291.90 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 02/26</span></td>
+        <td style="text-align:center">10 เดือน</td>
+        <td style="text-align:right;font-weight:700">691,051.48 บาท</td>
+      </tr>
+      <tr>
+        <td style="text-align:center">6</td>
+        <td><span style="background:#EDE0FF;color:#5B2D8E;padding:2px 8px;border-radius:8px;font-weight:700;font-size:11px">DVRD</span></td>
+        <td style="font-weight:600">Private Fitness</td>
+        <td style="font-size:11.5px;line-height:1.6"><b>5 Mar 26</b> 1,107,966.40 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 1-4/25</span><br><b>5 Apr 26</b> 1,107,966.40 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 5-9/25 (เดือน 7/25 ไม่มียอดค้างชำระ)</span><br><b>5 May 26</b> 1,777,423.66 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 10-12/25 และ 1-2/26</span></td>
+        <td style="text-align:center">3 เดือน</td>
+        <td style="text-align:right;font-weight:700">3,993,356.46 บาท</td>
+      </tr>
+      <tr>
+        <td style="text-align:center">7</td>
+        <td><span style="background:#EDE0FF;color:#5B2D8E;padding:2px 8px;border-radius:8px;font-weight:700;font-size:11px">DVRD</span></td>
+        <td style="font-weight:600">Tianzhi</td>
+        <td style="font-size:11.5px;line-height:1.6"><b>28 Apr 26</b> 36,727.75 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 6/25</span><br><b>28 May 26</b> 60,695.75 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 7/25</span><br><b>28 Jun 26</b> 74,584.57 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 12/24</span><br><b>28 Jul 26</b> 77,040.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 1-2,4-5/25</span><br><b>28 Aug 26</b> 94,641.50 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 8,10/25</span><br><b>28 Sep 26</b> 94,641.50 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 11-12/25</span><br><b>28 Oct 26</b> 77,040.00 <span style='color:var(--sub)'>ค่าเช่า ค่าบริการ ส่วนกลาง เดือน 9/25</span></td>
+        <td style="text-align:center">7 เดือน</td>
+        <td style="text-align:right;font-weight:700">266,323.00 บาท<div style='color:#DC2626;font-size:11px;margin-top:4px'>* ยอดรวมในไฟล์ต้นฉบับ (266,323.00) ไม่เท่ากับยอดรวมรายเดือนที่ระบุ (515,371.07) — คงยอด Total ตามไฟล์ต้นฉบับ โปรดตรวจทานกับทีมบัญชี</div></td>
+      </tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="badge badge-risk">หมายเหตุ</span> หนี้ปี 2026 (หนี้ใหม่)</div>
+    <p style="font-size:12px;color:var(--sub);line-height:1.8">
+      ทุกร้านค้าในตารางนี้ระบุเงื่อนไขหนี้ปี 2026 ว่า "จ่ายยอดปัจจุบันตามจริง" (ไม่ใช่จำนวนคงที่ต่อเดือน) จึงไม่มีตัวเลขระบุไว้ในไฟล์ต้นฉบับ
+    </p>
+  </div>
+</div>
+
+</div><!-- .content -->
+
+<script>
+// ══════════════════════════════════════════
+// CONSTANTS & DATA
+// ══════════════════════════════════════════
+const MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.'];
+const MONTHS_KEY = ['Jan','Feb','Mar','Apr','May','Jun'];
+const BRANCHES = ['DVRP','DVP','DVK','DVB','DVRD'];
+const BR_NAMES = {DVRP:'ราชพฤกษ์',DVP:'พุทธมณฑล',DVK:'เกษตร-นวมินทร์',DVB:'บางนา',DVRD:'รัชดา'};
+const BR_COLORS = {DVRP:'#FFD6E0',DVP:'#D6EAFF',DVK:'#D6F5E3',DVB:'#FFE8D0',DVRD:'#EDE0FF'};
+const BR_BORDER = {DVRP:'#F8B4C8',DVP:'#B0D4F8',DVK:'#A8E6C0',DVB:'#F9C896',DVRD:'#D4B8F8'};
+const BR_TEXT   = {DVRP:'#9B2335',DVP:'#1A5A8A',DVK:'#1A6640',DVB:'#8A3A00',DVRD:'#5B2D8E'};
+
+// NOTE (Jun 2026 DVK): official branch summary total for June (per Summary DV Aging on
+// June 2026, PPTX p.93/99) is 2,585,101.90 -- this EXCLUDES a THB 364,645.00 item for shop
+// "The Fitness" which the source file itself shows with a blank/excluded row total
+// (likely under separate settlement/dispute treatment), even though the same amount is
+// still counted in the 1-30 day aging bucket. Shop-level detail below keeps The Fitness's
+// own total (364,645.00) intact for the Shop tab; this branch-level array uses the
+// official (lower) figure so KPI cards/charts match the company's own headline number.
+const agingSummary = {
+  DVRP:[502520.48,507785.42,557227.89,540430.07,540430.07,610709.00],
+  DVP: [6420.00,1224.00,110003.36,116247.19,117747.19,184333.24],
+  DVK: [1195651.73,1562290.11,1735372.24,2721260.40,2231616.90,2585101.90],
+  DVB: [5703647.71,6199546.82,4989012.43,5210636.57,4887722.28,5179591.93],
+  DVRD:[13354165.37,13698494.95,12177474.24,10496367.08,8896552.15,7713320.43],
+};
+
+const agingBuckets = {
+  Jan:{
+    DVRP:[202317,89112,66922,108729,44440,807930,328601,173920],
+    DVP: [0,0,0,0,6420,15000,6420,0],
+    DVK: [199763,298199,127125,118897,451667,2827609,341021,854631],
+    DVB: [2429071,1029307,618881,563865,1062525,15815807,5480824,222824],
+    DVRD:[2181032,1404739,1800547,1438664,6529184,5359150,1868975,11485191],
+    Total:[5018603,2812357,2613475,2230155,8087816,24825496,8025841,12736565],
+  },
+  Feb:{
+    DVRP:[22702,222253,123809,79173,59849,807930,321946,185840],
+    DVP: [0,0,1224,0,0,322570,1224,0],
+    DVK: [453861,338823,105241,118897,545468,1843460,367592,1194698],
+    DVB: [2883440,1056651,1152803,157240,949413,15902909,4977257,1222289],
+    DVRD:[1674945,1655948,1147821,1477612,7742170,5569149,3249030,10449465],
+    Total:[5034948,3273675,2530897,1832922,9296900,24446018,8917049,13052292],
+  },
+  Mar:{
+    DVRP:[0,216179,129891,127940,83218,684330,331441,225787],
+    DVP: [110003,0,0,0,0,300240,110003,0],
+    DVK: [838057,264628,191465,116991,324231,3064519,1012998,722374],
+    DVB: [1977617,1454064,203413,164342,1189577,15902909,1498400,3490612],
+    DVRD:[969395,1062895,1161835,1065721,7917628,5569149,4279832,7897642],
+    Total:[3895072,2997766,1686604,1474993,9515654,25521148,7232673,12336415],
+  },
+  Apr:{
+    DVRP:[212623,133711,74358,63934,55804,684330,331422,209008],
+    DVP: [116247,0,0,0,0,296400,116247,0],
+    DVK: [626852,1101884,199897,73282,719345,3376877,1362922,1358339],
+    DVB: [1572532,467793,1531084,109453,1529774,16169207,3391370,1819266],
+    DVRD:[793315,972704,892831,1022557,6814960,5889299,4459681,6036686],
+    Total:[3321569,2676092,2698170,1269226,9119883,26416113,9661642,9423299],
+  },
+  May:{
+    DVRP:[212623,133711,74358,63934,55804,684330,344100,196330],
+    DVP: [117747,0,0,0,0,296400,117747,0],
+    DVK: [831732,259898,606262,73282,460443,2541516,1624515,607101],
+    DVB: [1780535,974692,614862,300657,1216976,16174207,3624551,1263171],
+    DVRD:[685309,619016,598316,547505,6446406,5889299,7476661,1419892],
+    Total:[3627945,1987316,1893798,985378,8179629,25585752,13187574,3486494],
+  },
+  Jun:{
+    DVRP:[247970.12,75344.63,58495.35,58645.15,170253.75,807930.00,264920.38,345788.62],
+    DVP: [184333.24,0,0,0,0,9244664.11,184333.24,0],
+    DVK: [1265787.92,590303.52,488149.13,73282.34,532223.99,2933598.33,1986777.29,598324.61],
+    DVB: [3063970.76,815444.65,54372.49,72854.30,1172949.73,15908439.33,3757427.38,1422164.55],
+    DVRD:[469857.93,419530.77,488631.68,498855.36,5836444.69,5704499.00,6558460.43,1154860.00],
+    Total:[5231919.97,1900623.57,1089648.65,703637.15,7711872.16,34599130.77,12751918.72,3521137.78],
+  },
+};
+
+const shopData = {
+  Jan: [
+    {branch:'DVRP',shop:'Fur Figure',company:'บจก.คณานับ อินทิเรียฯ',b1:58430,b2:56820,b3:58670,b4:46950,b5:44440,total:265310,unpaid:173920,deposit:196330},
+    {branch:'DVRP',shop:'Greenery',company:'บจก.กรีนเนอรี โปรดักส์',b1:0,b2:3294,b3:0,b4:0,b5:61779,total:65073,unpaid:0,deposit:338000},
+    {branch:'DVRP',shop:'Tonari',company:'บจก.ไอเอ็มซีเอฟ',b1:64006,b2:15117,b3:8252,b4:0,b5:0,total:87375,unpaid:0,deposit:150000},
+    {branch:'DVRP',shop:'Zedere',company:'บจก.เซเดอร์เร่',b1:79881,b2:4882,b3:0,b4:0,b5:0,total:84763,unpaid:0,deposit:123600},
+    {branch:'DVP',shop:'Olino',company:'คุณปิยพล ศักย์ธนคิวะกุล',b1:6420,b2:0,b3:0,b4:0,b5:0,total:6420,unpaid:0,deposit:15000},
+    {branch:'DVK',shop:'สยามแหนมเนือง',company:'คุณจินตนา ธรรมรสเดชา',b1:0,b2:35937,b3:37439,b4:73282,b5:308038,total:454696,unpaid:454696,deposit:384084},
+    {branch:'DVK',shop:"Bellinee's",company:'บมจ.ซีพี ออลล์',b1:0,b2:0,b3:0,b4:0,b5:3629,total:3629,unpaid:0,deposit:241500},
+    {branch:'DVK',shop:'CDA',company:'บจก.ซีดิเอ-โปรออดิโอ',b1:0,b2:0,b3:89686,b4:0,b5:0,total:89686,unpaid:89686,deposit:388050},
+    {branch:'DVK',shop:'Bloom Nail Spa',company:'บจก.บลูมมิ่ง เวลเนส',b1:25407,b2:865,b3:0,b4:0,b5:0,total:26272,unpaid:0,deposit:134000},
+    {branch:'DVK',shop:'ชาบูคุณแม่',company:'บจก.ชาบูคุณแม่',b1:57259,b2:136859,b3:0,b4:0,b5:0,total:194119,unpaid:0,deposit:380033},
+    {branch:'DVK',shop:'C2E',company:'บจก.ชาร์จ ทู เอ็รัน',b1:39558,b2:85076,b3:0,b4:45615,b5:0,total:170249,unpaid:170249,deposit:251364},
+    {branch:'DVK',shop:'A Tiara Jewelry',company:'คุณสำรวงษ์ หูลนุช',b1:35310,b2:36292,b3:0,b4:0,b5:0,total:71602,unpaid:0,deposit:68800},
+    {branch:'DVK',shop:'Zedere',company:'บจก.เซเดอร์เร่',b1:7744,b2:0,b3:0,b4:0,b5:0,total:7744,unpaid:0,deposit:93600},
+    {branch:'DVK',shop:'หอมขนมครก',company:'คุณศิริพรรณ รักเรื่อง',b1:17120,b2:3170,b3:0,b4:0,b5:0,total:20290,unpaid:0,deposit:34240},
+    {branch:'DVK',shop:'QQ Dressert',company:'บจก.คิวโอแอล เอ็นเตอร์ไพรเซส',b1:17366,b2:0,b3:0,b4:0,b5:0,total:17366,unpaid:0,deposit:52098},
+    {branch:'DVK',shop:'ทีออเรนโซ่',company:'คุณอภิวัฒน์ โยสัย',b1:0,b2:0,b3:0,b4:0,b5:140000,total:140000,unpaid:140000,deposit:16050},
+    {branch:'DVB',shop:'บจก.บีทีวี ฟู้ด แอนด์ เบเวอเรจ',company:'บจก.บีทีวี ฟู้ด แอนด์ เบเวอเรจ',b1:18935.79,b2:0,b3:0,b4:0,b5:0,total:18935.79,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก. สยามอาร์ตมาเบิล',company:'บจก. สยามอาร์ตมาเบิล',b1:22273.39,b2:0,b3:0,b4:0,b5:0,total:22273.39,unpaid:0,deposit:689276.43},
+    {branch:'DVB',shop:'บมจ.ร่วมเจริญพัฒนา ROU',company:'บมจ.ร่วมเจริญพัฒนา ROU',b1:13300.47,b2:0,b3:0,b4:0,b5:0,total:13300.47,unpaid:0,deposit:272048},
+    {branch:'DVB',shop:'บจก. แจลลุกซ์ เอเซีย',company:'บจก. แจลลุกซ์ เอเซีย',b1:56645.93,b2:0,b3:0,b4:0,b5:0,total:56645.93,unpaid:0,deposit:427464.5},
+    {branch:'DVB',shop:'บจก. อีโวลท์ เทคโนโลยี',company:'บจก. อีโวลท์ เทคโนโลยี',b1:6998.82,b2:0,b3:0,b4:0,b5:0,total:6998.82,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก. มาซารุ ชาบู ดีไซน์',company:'บจก. มาซารุ ชาบู ดีไซน์',b1:187993,b2:0,b3:0,b4:0,b5:0,total:187993,unpaid:0,deposit:390782},
+    {branch:'DVB',shop:'บจก.ยูนิโคล่ (ประเทศไทย)',company:'บจก.ยูนิโคล่ (ประเทศไทย)',b1:88020.75,b2:0,b3:0,b4:0,b5:0,total:88020.75,unpaid:0,deposit:4937300},
+    {branch:'DVB',shop:'บจก.วินโดว์ ทรีทเมนท์ โซลูซันส์',company:'บจก.วินโดว์ ทรีทเมนท์ โซลูซันส์',b1:8896.38,b2:0,b3:0,b4:0,b5:0,total:8896.38,unpaid:0,deposit:333101},
+    {branch:'DVB',shop:'บจก.ไฮแคร์ เฮลท์',company:'บจก.ไฮแคร์ เฮลท์',b1:34692.75,b2:0,b3:0,b4:0,b5:0,total:34692.75,unpaid:0,deposit:271392},
+    {branch:'DVB',shop:'บจก.วราภรณ์ สมพงษ์ ฟู้ดส์',company:'บจก.วราภรณ์ สมพงษ์ ฟู้ดส์',b1:48112.4,b2:0,b3:0,b4:0,b5:0,total:48112.4,unpaid:0,deposit:144724.7},
+    {branch:'DVB',shop:'บจก.ไวท์แค็ตตาล็อค',company:'บจก.ไวท์แค็ตตาล็อค',b1:50616.96,b2:8690.66,b3:0,b4:0,b5:0,total:59307.62,unpaid:59307.62,deposit:174872},
+    {branch:'DVB',shop:'บจก. ซิกเนเจอร์ โกลบอล ROU',company:'บจก. ซิกเนเจอร์ โกลบอล ROU',b1:203413.09,b2:164341.7,b3:157239.81,b4:161437.63,b5:160525.88,total:846958.11,unpaid:846958.11,deposit:393656},
+    {branch:'DVB',shop:'บจก. โซฟาเฮ้าส์ 1998',company:'บจก. โซฟาเฮ้าส์ 1998',b1:0,b2:0,b3:0,b4:0,b5:19200,total:19200,unpaid:19200,deposit:0},
+    {branch:'DVB',shop:'บจก. เซเดอร์เร่',company:'บจก. เซเดอร์เร่',b1:0,b2:0,b3:0,b4:0,b5:41895,total:41895,unpaid:41895,deposit:0},
+    {branch:'DVB',shop:'บจก. อาฟเตอร์ ยู',company:'บจก. อาฟเตอร์ ยู',b1:48729.16,b2:0,b3:0,b4:0,b5:0,total:48729.16,unpaid:0,deposit:215217.5},
+    {branch:'DVB',shop:'บจก.คอฟฟี่ คอนเซ็ปต์ รีเทล',company:'บจก.คอฟฟี่ คอนเซ็ปต์ รีเทล',b1:186780.29,b2:0,b3:0,b4:0,b5:0,total:186780.29,unpaid:0,deposit:308400},
+    {branch:'DVB',shop:'บจก. กาแล็กซี่ฟิตเนส ROU',company:'บจก. กาแล็กซี่ฟิตเนส ROU',b1:703234.51,b2:732420.49,b3:205600,b4:246576.98,b5:411200,total:2299031.98,unpaid:2299031.98,deposit:1374200},
+    {branch:'DVB',shop:'บจก. ไอเบอร์รี่ โฮมเมด',company:'บจก. ไอเบอร์รี่ โฮมเมด',b1:132548.7,b2:0,b3:0,b4:0,b5:0,total:132548.7,unpaid:0,deposit:476921},
+    {branch:'DVB',shop:'บจก. แอล เอ็น จีฟู้ดโปรดักส์',company:'บจก. แอล เอ็น จีฟู้ดโปรดักส์',b1:32929.8,b2:0,b3:0,b4:0,b5:0,total:32929.8,unpaid:0,deposit:248261},
+    {branch:'DVB',shop:'บจก. เดอะไลฟ์แคร์ ROU',company:'บจก. เดอะไลฟ์แคร์ ROU',b1:12660.25,b2:0,b3:0,b4:0,b5:0,total:12660.25,unpaid:0,deposit:421368.8},
+    {branch:'DVB',shop:'บจก. เฉิน บราเธอร์',company:'บจก. เฉิน บราเธอร์',b1:12885.65,b2:0,b3:0,b4:0,b5:0,total:12885.65,unpaid:0,deposit:485270},
+    {branch:'DVB',shop:'บจก. พฤกษาคลีนิค โฮลดิ้ง',company:'บจก. พฤกษาคลีนิค โฮลดิ้ง',b1:229955.64,b2:0,b3:0,b4:0,b5:0,total:229955.64,unpaid:229955.64,deposit:664114.4},
+    {branch:'DVB',shop:'บจก. 246 คาร์ วอช ไวบซ ROU',company:'บจก. 246 คาร์ วอช ไวบซ ROU',b1:91902,b2:0,b3:0,b4:0,b5:0,total:91902,unpaid:91902,deposit:325706},
+    {branch:'DVB',shop:'บจก. บลู ฟลอริช',company:'บจก. บลู ฟลอริช',b1:91.69,b2:0,b3:0,b4:0,b5:0,total:91.69,unpaid:0,deposit:10000},
+    {branch:'DVB',shop:'บจก. เดอะมอลล์ กรุ๊ป',company:'บจก. เดอะมอลล์ กรุ๊ป',b1:179641.69,b2:0,b3:0,b4:0,b5:0,total:179641.69,unpaid:0,deposit:2700000},
+    {branch:'DVB',shop:'บจก. พัทยา อินเตอร์',company:'บจก. พัทยา อินเตอร์',b1:21476.47,b2:0,b3:0,b4:0,b5:180928.98,total:202405.45,unpaid:202405.45,deposit:0},
+    {branch:'DVB',shop:'คุณอภิวัฒน์ โยลัย',company:'คุณอภิวัฒน์ โยลัย',b1:0,b2:0,b3:0,b4:155850,b5:248775,total:404625,unpaid:404625,deposit:0},
+    {branch:'DVB',shop:'บจก. สตาร์มาร์คแมนูแฟคเชอร์ริง',company:'บจก. สตาร์มาร์คแมนูแฟคเชอร์ริง',b1:13864.53,b2:0,b3:0,b4:0,b5:0,total:13864.53,unpaid:0,deposit:455834},
+    {branch:'DVB',shop:'บจก.ซันโกรว์ รีนิว เอเบิลส์',company:'บจก.ซันโกรว์ รีนิว เอเบิลส์',b1:13343.56,b2:123853.84,b3:256040.97,b4:0,b5:0,total:393238.37,unpaid:393238.37,deposit:183000},
+    {branch:'DVB',shop:'คุณธิติการ เทศไทสง',company:'คุณธิติการ เทศไทสง',b1:9127.1,b2:0,b3:0,b4:0,b5:0,total:9127.1,unpaid:0,deposit:95898},
+    {branch:'DVRD',shop:'ร้าน 7-Eleven SH-A101A',company:'บริษัท ซีพี ออลล์ จำกัด (มหาชน)',b1:126245.5,b2:321,b3:32849.6,b4:299.6,b5:565.5,total:160281.2,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน รสนิยม SH-A102',company:'บริษัท ไอเบอร์รี่ โฮมเมด จำกัด',b1:95334.08,b2:0,b3:0,b4:0,b5:0,total:95334.08,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน โอจัง SH-A103',company:'บริษัท โอ จัง ยาคินิคุ จำกัด',b1:146654.05,b2:145042.21,b3:197170.18,b4:150337.67,b5:989288.1,total:1628492.21,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ลิ้มเหล่าโหงว SH-A104',company:'บริษัท แอล เอ็น จี ฟู๊ด โปรดักส์ จำกัด',b1:96855.63,b2:80038.7,b3:117234.95,b4:80038.7,b5:575947.35,total:950115.33,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ทูดาริ (SH-A104)',company:'บริษัท ทูดาริ เอฟบีซี จำกัด',b1:87316.95,b2:0,b3:0,b4:68006.25,b5:286812,total:442135.2,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ก๋วยเตี๋ยวเรือวัดไทร SH-A10',company:'บริษัท ไลฟ์สไตล์ ฟู้ด จำกัด',b1:83563.92,b2:82752.96,b3:84434.45,b4:134748.44,b5:563773.8,total:949273.57,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน Hey Coffee (OP-A101-102)',company:'บริษัท ริช เอ็กซ์เพรส (ไทยแลนด์) จำกัด',b1:79043.22,b2:72225,b3:141975,b4:72225,b5:650025,total:1015493.22,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'บริษัท มาย ฟุกุ มัทชะ จำกัด',company:'บริษัท มาย ฟุกุ มัทชะ จำกัด',b1:13798.73,b2:0,b3:42412.5,b4:0,b5:0,total:56211.23,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Shiguma (SH-A203)',company:'นางสาวชุตินันท์ รัตนสุนทร',b1:131606.93,b2:124609.12,b3:144123.7,b4:98396.2,b5:643550.2,total:1142286.15,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'โอชาม ข้าวต้มแห้ง (SH-A207-208)',company:'บริษัท รุ่งทรัพย์ 168 จำกัด',b1:79657.04,b2:14872.44,b3:0,b4:114374.81,b5:193370.1,total:402274.39,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Maru Waffle (OP-A201)',company:'นางสาวญาณี พิมุขมนัสกิจ',b1:32786.58,b2:0,b3:0,b4:35549.82,b5:0,total:68336.4,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Yoguruto (OP-A202)',company:'นางพสุมนต์ อิงคุทานนท์',b1:797.66,b2:0,b3:25650.03,b4:0,b5:13910,total:40357.69,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:"I'm Dental Studio (SH-A305)",company:'บริษัท ไอแอมเด็นทัลสตูดิโอ (รัชดา) จำกัด',b1:194783.15,b2:9643.28,b3:140156.25,b4:0,b5:258750,total:603332.68,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Million Salon (SH-A307)',company:'บริษัท มิลเลี่ยนซาลอน จำกัด',b1:69410.11,b2:71561.96,b3:114254.15,b4:76068.22,b5:246505.59,total:577800.03,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Felizia Nails (SH-A308)',company:'บริษัท เฟลิเนลล์ จำกัด',b1:106166.74,b2:98616.85,b3:166629.85,b4:93081,b5:750365.61,total:1214860.05,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Rolling Roaster (GP) (SH-C101)',company:'บริษัท 999 คิดบวก จำกัด',b1:54812.46,b2:52447.28,b3:0,b4:43114.6,b5:0,total:150374.34,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Private Fitness (SH-A301)',company:'บริษัท วีทีพี สามสิบสอง กรุ๊ป จำกัด',b1:377770.4,b2:346634.55,b3:483249.55,b4:361383.16,b5:2215932.8,total:3784970.46,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Recovery me (SH-A303)',company:'บริษัท วันดีดี สตอรี่ จำกัด',b1:98775.56,b2:94225.72,b3:41475,b4:0,b5:1039,total:235515.28,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Brewave (GP) (SH-A201-202)',company:'บริษัท บุญเวฟ จำกัด',b1:189266.88,b2:182684.89,b3:111389.18,b4:145596.8,b5:693364.59,total:1322302.34,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Tianzhi (OP-A104)',company:'บริษัท เถียนจื้อ ฟู้ดแอนด์เบฟเวอเรจ จำกัด',b1:64404.64,b2:50290,b3:97962.78,b4:50290,b5:352030,total:614977.42,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'How To Clinic',company:'บจก.ฮาว ทู เอส เมดดิคอล',b1:0,b2:0,b3:23400,b4:0,b5:0,total:23400,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Playsound',company:'คุณศรีจิตรา',b1:34988.21,b2:23005,b3:0,b4:0,b5:0,total:57993.21,unpaid:0,deposit:0},
+  
+  ],
+  Feb: [
+    {branch:'DVRP',shop:'Fur Figure',company:'บจก.คณานับ อินทิเรียฯ',b1:2841,b2:55804,b3:55804,b4:55804,b5:55804,total:226058,unpaid:170254,deposit:196330},
+    {branch:'DVRP',shop:'Greenery',company:'บจก.กรีนเนอรี โปรดักส์',b1:2841,b2:101286,b3:3998,b4:0,b5:0,total:108125,unpaid:2841,deposit:338000},
+    {branch:'DVRP',shop:'Tonari',company:'บจก.ไอเอ็มซีเอฟ',b1:8701,b2:63663,b3:64006,b4:23369,b5:4044,total:163783,unpaid:12745,deposit:150000},
+    {branch:'DVRP',shop:'Zedere',company:'บจก.เซเดอร์เร่',b1:5020,b2:0,b3:0,b4:0,b5:0,total:5020,unpaid:0,deposit:123600},
+    {branch:'DVRP',shop:'Jas Sofa',company:'บจก.ไดมอนด์ โซฟา',b1:3299,b2:0,b3:0,b4:0,b5:0,total:3299,unpaid:0,deposit:566202},
+    {branch:'DVRP',shop:'EVOLT',company:'บจก.อีโวลท์ เทคโนโลยี',b1:0,b2:1500,b3:0,b4:0,b5:0,total:1500,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Salad Factory',company:'บจก. กรีนฟัด แฟคทอรี',b1:0,b2:0,b3:1224,b4:0,b5:0,total:1224,unpaid:0,deposit:322570},
+    {branch:'DVK',shop:'สยามแหนมเนือง',company:'คุณจินตนา ธรรมรสเดชา',b1:0,b2:35937,b3:37439,b4:73282,b5:308038,total:454696,unpaid:454696,deposit:384084},
+    {branch:'DVK',shop:'CDA',company:'บจก.ซีดิเอ-โปรออดิโอ',b1:0,b2:0,b3:0,b4:0,b5:89686,total:89686,unpaid:89686,deposit:388050},
+    {branch:'DVK',shop:'Bloom Nail Spa',company:'บจก.บลูมมิ่ง เวลเนส',b1:25407,b2:26259,b3:865,b4:0,b5:0,total:52531,unpaid:0,deposit:134000},
+    {branch:'DVK',shop:'C2E',company:'บจก.ชาร์จ ทู เอ็รัน',b1:39558,b2:85076,b3:0,b4:45615,b5:0,total:170249,unpaid:170249,deposit:251364},
+    {branch:'DVK',shop:'A Tiara Jewelry',company:'คุณสำรวงษ์ หูลนุช',b1:35310,b2:36212,b3:0,b4:0,b5:0,total:71522,unpaid:0,deposit:68800},
+    {branch:'DVK',shop:'Zedere',company:'บจก.เซเดอร์เร่',b1:0,b2:0,b3:0,b4:0,b5:7744,total:7744,unpaid:7744,deposit:93600},
+    {branch:'DVK',shop:'Red Panda',company:'บจก.เรดแพนด้าเดเอ็น',b1:111361,b2:154025,b3:43708,b4:0,b5:0,total:309095,unpaid:309095,deposit:334084},
+    {branch:'DVK',shop:'Maxxtec',company:'บจก.ไทยรุ่งกิจ มัลติเทค',b1:35550,b2:1314,b3:0,b4:0,b5:0,total:36864,unpaid:0,deposit:139188},
+    {branch:'DVK',shop:'The Fitness (New)',company:'บจก.เดอะฟิตเนส แพลทิบัม',b1:100000,b2:0,b3:0,b4:0,b5:0,total:100000,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก.บีทีวี ฟู้ด แอนด์ เบเวอเรจ',company:'บจก.บีทีวี ฟู้ด แอนด์ เบเวอเรจ',b1:19003.74,b2:0,b3:0,b4:0,b5:0,total:19003.74,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก. สยามอาร์ตมาเบิล',company:'บจก. สยามอาร์ตมาเบิล',b1:29812.87,b2:0,b3:0,b4:0,b5:0,total:29812.87,unpaid:0,deposit:689276.43},
+    {branch:'DVB',shop:'บมจ.ร่วมเจริญพัฒนา ROU',company:'บมจ.ร่วมเจริญพัฒนา ROU',b1:14757.95,b2:0,b3:0,b4:0,b5:0,total:14757.95,unpaid:0,deposit:272048},
+    {branch:'DVB',shop:'บจก. แจลลุกซ์ เอเซีย',company:'บจก. แจลลุกซ์ เอเซีย',b1:56250.59,b2:0,b3:0,b4:0,b5:0,total:56250.59,unpaid:0,deposit:427464.5},
+    {branch:'DVB',shop:'บจก. อีโวลท์ เทคโนโลยี',company:'บจก. อีโวลท์ เทคโนโลยี',b1:1500,b2:0,b3:0,b4:0,b5:0,total:1500,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก. มาซารุ ชาบู ดีไซน์',company:'บจก. มาซารุ ชาบู ดีไซน์',b1:192226.22,b2:0,b3:0,b4:0,b5:0,total:192226.22,unpaid:0,deposit:390782},
+    {branch:'DVB',shop:'บจก.ยูนิโคล่ (ประเทศไทย)',company:'บจก.ยูนิโคล่ (ประเทศไทย)',b1:89290.92,b2:0,b3:0,b4:0,b5:0,total:89290.92,unpaid:0,deposit:4937300},
+    {branch:'DVB',shop:'บจก.วินโดว์ ทรีทเมนท์ โซลูซันส์',company:'บจก.วินโดว์ ทรีทเมนท์ โซลูซันส์',b1:9508.96,b2:0,b3:0,b4:0,b5:0,total:9508.96,unpaid:0,deposit:333101},
+    {branch:'DVB',shop:'บจก.ไฮแคร์ เฮลท์',company:'บจก.ไฮแคร์ เฮลท์',b1:41267.9,b2:0,b3:0,b4:0,b5:0,total:41267.9,unpaid:0,deposit:271392},
+    {branch:'DVB',shop:'บจก.วราภรณ์ สมพงษ์ ฟู้ดส์',company:'บจก.วราภรณ์ สมพงษ์ ฟู้ดส์',b1:50072.19,b2:0,b3:0,b4:0,b5:0,total:50072.19,unpaid:0,deposit:144724.7},
+    {branch:'DVB',shop:'บจก.ไวท์แค็ตตาล็อค',company:'บจก.ไวท์แค็ตตาล็อค',b1:60564.89,b2:0,b3:0,b4:0,b5:0,total:60564.89,unpaid:60564.89,deposit:174872},
+    {branch:'DVB',shop:'บจก. ซิกเนเจอร์ โกลบอล ROU',company:'บจก. ซิกเนเจอร์ โกลบอล ROU',b1:313033.24,b2:203413.09,b3:164341.7,b4:157239.81,b5:321963.55,total:1159991.39,unpaid:1159991.39,deposit:393656},
+    {branch:'DVB',shop:'บจก. เซเดอร์เร่',company:'บจก. เซเดอร์เร่',b1:0,b2:0,b3:0,b4:0,b5:41895,total:41895,unpaid:41895,deposit:0},
+    {branch:'DVB',shop:'บจก. อาฟเตอร์ ยู',company:'บจก. อาฟเตอร์ ยู',b1:52838.23,b2:0,b3:0,b4:0,b5:0,total:52838.23,unpaid:0,deposit:215217.5},
+    {branch:'DVB',shop:'บจก.คอฟฟี่ คอนเซ็ปต์ รีเทล',company:'บจก.คอฟฟี่ คอนเซ็ปต์ รีเทล',b1:169572.14,b2:26149.84,b3:0,b4:0,b5:0,total:195721.98,unpaid:0,deposit:308400},
+    {branch:'DVB',shop:'บจก. กาแล็กซี่ฟิตเนส ROU',company:'บจก. กาแล็กซี่ฟิตเนส ROU',b1:1290405.95,b2:703234.51,b3:732420.49,b4:0,b5:0,total:2726060.95,unpaid:2726060.95,deposit:1374200},
+    {branch:'DVB',shop:'บจก. ไอเบอร์รี่ โฮมเมด',company:'บจก. ไอเบอร์รี่ โฮมเมด',b1:146217.65,b2:0,b3:0,b4:0,b5:0,total:146217.65,unpaid:0,deposit:476921},
+    {branch:'DVB',shop:'บจก. แอล เอ็น จีฟู้ดโปรดักส์',company:'บจก. แอล เอ็น จีฟู้ดโปรดักส์',b1:36078.13,b2:0,b3:0,b4:0,b5:0,total:36078.13,unpaid:0,deposit:248261},
+    {branch:'DVB',shop:'บจก. เดอะไลฟ์แคร์ ROU',company:'บจก. เดอะไลฟ์แคร์ ROU',b1:17131.32,b2:0,b3:0,b4:0,b5:0,total:17131.32,unpaid:0,deposit:421368.8},
+    {branch:'DVB',shop:'บจก. เฉิน บราเธอร์',company:'บจก. เฉิน บราเธอร์',b1:15235.33,b2:0,b3:0,b4:0,b5:0,total:15235.33,unpaid:0,deposit:485270},
+    {branch:'DVB',shop:'บจก. พฤกษาคลีนิค โฮลดิ้ง',company:'บจก. พฤกษาคลีนิค โฮลดิ้ง',b1:33919.17,b2:0,b3:0,b4:0,b5:0,total:33919.17,unpaid:0,deposit:664114.4},
+    {branch:'DVB',shop:'บจก. 246 คาร์ วอช ไวบซ ROU',company:'บจก. 246 คาร์ วอช ไวบซ ROU',b1:13357.28,b2:0,b3:0,b4:0,b5:0,total:13357.28,unpaid:0,deposit:325706},
+    {branch:'DVB',shop:'บจก. บลู ฟลอริช',company:'บจก. บลู ฟลอริช',b1:120.17,b2:0,b3:0,b4:0,b5:0,total:120.17,unpaid:0,deposit:10000},
+    {branch:'DVB',shop:'บจก. เดอะมอลล์ กรุ๊ป',company:'บจก. เดอะมอลล์ กรุ๊ป',b1:149893.99,b2:0,b3:0,b4:0,b5:0,total:149893.99,unpaid:0,deposit:2700000},
+    {branch:'DVB',shop:'บจก. พัทยา อินเตอร์',company:'บจก. พัทยา อินเตอร์',b1:24228.04,b2:0,b3:0,b4:0,b5:180928.98,total:205157.02,unpaid:205157.02,deposit:0},
+    {branch:'DVB',shop:'คุณอภิวัฒน์ โยลัย',company:'คุณอภิวัฒน์ โยลัย',b1:0,b2:0,b3:0,b4:0,b5:404625,total:404625,unpaid:404625,deposit:0},
+    {branch:'DVB',shop:'บจก. สตาร์มาร์คแมนูแฟคเชอร์ริง',company:'บจก. สตาร์มาร์คแมนูแฟคเชอร์ริง',b1:16401.76,b2:0,b3:0,b4:0,b5:0,total:16401.76,unpaid:0,deposit:455834},
+    {branch:'DVB',shop:'บจก. จีเอซี เอนเนอยี่ เทคโนโลยี',company:'บจก. จีเอซี เอนเนอยี่ เทคโนโลยี',b1:14716.98,b2:0,b3:0,b4:0,b5:0,total:14716.98,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก.ซันโกรว์ รีนิว เอเบิลส์',company:'บจก.ซันโกรว์ รีนิว เอเบิลส์',b1:15928.95,b2:123853.84,b3:256040.97,b4:0,b5:0,total:395823.76,unpaid:395823.76,deposit:183000},
+    {branch:'DVB',shop:'คุณธิติการ เทศไทสง',company:'คุณธิติการ เทศไทสง',b1:10105.48,b2:0,b3:0,b4:0,b5:0,total:10105.48,unpaid:0,deposit:95898},
+    {branch:'DVRD',shop:'ร้าน 7-Eleven SH-A101A',company:'บริษัท ซีพี ออลล์ จำกัด (มหาชน)',b1:363.8,b2:0,b3:0,b4:32550,b5:565.5,total:33479.3,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน รสนิยม SH-A102',company:'บริษัท ไอเบอร์รี่ โฮมเมด จำกัด',b1:94546.31,b2:0,b3:0,b4:0,b5:0,total:94546.31,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน โอจัง SH-A103',company:'บริษัท โอ จัง ยาคินิคุ จำกัด',b1:144448.88,b2:146654.05,b3:145042.21,b4:121014.45,b5:1187015.49,total:1744175.08,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ลิ้มเหล่าโหงว SH-A104',company:'บริษัท แอล เอ็น จี ฟู๊ด โปรดักส์ จำกัด',b1:96692.86,b2:80038.7,b3:80038.7,b4:62390.51,b5:573936.23,total:893097,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ทูดาริ (SH-A104)',company:'บริษัท ทูดาริ เอฟบีซี จำกัด',b1:120998.27,b2:71703,b3:0,b4:0,b5:175560.75,total:368262.02,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ก๋วยเตี๋ยวเรือวัดไทร SH-A10',company:'บริษัท ไลฟ์สไตล์ ฟู้ด จำกัด',b1:57116.04,b2:83563.92,b3:82752.96,b4:84434.45,b5:698522.24,total:1006389.61,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน Hey Coffee (OP-A101-102)',company:'บริษัท ริช เอ็กซ์เพรส (ไทยแลนด์) จำกัด',b1:0,b2:79154.36,b3:72225,b4:52323,b5:712392,total:916094.36,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'บริษัท มาย ฟุกุ มัทชะ จำกัด',company:'บริษัท มาย ฟุกุ มัทชะ จำกัด',b1:14189.39,b2:0,b3:0,b4:0,b5:42412.5,total:56601.89,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'บจก.รวยเป็นร้าน',company:'บจก.รวยเป็นร้าน',b1:98396.2,b2:98396.2,b3:124609.12,b4:133516.8,b5:778679.44,total:1233597.76,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'โอชาม ข้าวต้มแห้ง (SH-A207-208)',company:'บริษัท รุ่งทรัพย์ 168 จำกัด',b1:78171.34,b2:79657.04,b3:14872.44,b4:0,b5:273800.45,total:446501.27,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Maru Waffle (OP-A201)',company:'นางสาวญาณี พิมุขมนัสกิจ',b1:22099.93,b2:32786.58,b3:0,b4:0,b5:35549.82,total:90436.33,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Yoguruto (OP-A202)',company:'นางพสุมนต์ อิงคุทานนท์',b1:0,b2:0,b3:0,b4:25650.03,b5:0,total:25650.03,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:"I'm Dental Studio (SH-A305)",company:'บริษัท ไอแอมเด็นทัลสตูดิโอ (รัชดา) จำกัด',b1:194161.77,b2:194783.15,b3:9643.28,b4:140156.25,b5:0,total:538744.45,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Felizia Nails (SH-A308)',company:'บริษัท เฟลิเนลล์ จำกัด',b1:105991.94,b2:100174.2,b3:70244.05,b4:138257.05,b5:707806.41,total:1122473.65,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Rolling Roaster (GP) (SH-C101)',company:'บริษัท 999 คิดบวก จำกัด',b1:53900.21,b2:54812.46,b3:0,b4:0,b5:43114.6,total:151827.27,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Private Fitness (SH-A301)',company:'บริษัท วีทีพี สามสิบสอง กรุ๊ป จำกัด',b1:383569.13,b2:377770.4,b3:346634.55,b4:483249.55,b5:2577315.96,total:4168539.59,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Recovery me (SH-A303)',company:'บริษัท วันดีดี สตอรี่ จำกัด',b1:101123.65,b2:101664.56,b3:0,b4:41475,b5:0,total:244263.21,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Brewave (GP) (SH-A201-202)',company:'บริษัท บุญเวฟ จำกัด',b1:125217.82,b2:189266.88,b3:182684.89,b4:105249,b5:606170.57,total:1208589.16,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Tianzhi (OP-A104)',company:'บริษัท เถียนจื้อ ฟู้ดแอนด์เบฟเวอเรจ จำกัด',b1:65044.64,b2:60348,b3:33945.75,b4:33945.75,b5:492293.1,total:685577.24,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'How To Clinic',company:'บจก.ฮาว ทู เอส เมดดิคอล',b1:0,b2:0,b3:0,b4:23400,b5:0,total:23400,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Playsound',company:'คุณศรีจิตรา',b1:35168.11,b2:1502.01,b3:0,b4:0,b5:0,total:36670.12,unpaid:0,deposit:0},
+  
+  ],
+  Mar: [
+    {branch:'DVRP',shop:'Fur Figure',company:'บจก.คณานับ อินทิเรียฯ',b1:0,b2:55804,b3:58645,b4:55804,b5:55804,total:226057,unpaid:170254,deposit:196330},
+    {branch:'DVRP',shop:'Greenery',company:'บจก.กรีนเนอรี โปรดักส์',b1:0,b2:101286,b3:3998,b4:36154,b5:27278,total:168716,unpaid:0,deposit:338000},
+    {branch:'DVRP',shop:'Tonari',company:'บจก.ไอเอ็มซีเอฟ',b1:0,b2:63663,b3:67248,b4:35982,b5:0,total:166893,unpaid:0,deposit:150000},
+    {branch:'DVP',shop:'EV Charger',company:'',b1:110003,b2:0,b3:0,b4:0,b5:0,total:110003,unpaid:110003,deposit:300240},
+    {branch:'DVK',shop:'สยามแหนมเนือง',company:'คุณจินตนา ธรรมรสเดชา',b1:0,b2:35937,b3:37439,b4:73282,b5:308038,total:454696,unpaid:454696,deposit:384084},
+    {branch:'DVK',shop:'CDA',company:'บจก.ซีดิเอ-โปรออดิโอ',b1:0,b2:0,b3:0,b4:0,b5:89686,total:89686,unpaid:89686,deposit:388050},
+    {branch:'DVK',shop:'Red Panda',company:'บจก.เรดแพนด้าเดเอ็น',b1:111361,b2:154564,b3:37535,b4:0,b5:0,total:303461,unpaid:0,deposit:334084},
+    {branch:'DVB',shop:'บจก.บีทีวี ฟู้ด แอนด์ เบเวอเรจ',company:'บจก.บีทีวี ฟู้ด แอนด์ เบเวอเรจ',b1:7937.8,b2:0,b3:0,b4:0,b5:0,total:7937.8,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก. สยามอาร์ตมาเบิล',company:'บจก. สยามอาร์ตมาเบิล',b1:30283.68,b2:0,b3:0,b4:0,b5:0,total:30283.68,unpaid:0,deposit:689276.43},
+    {branch:'DVB',shop:'บมจ.ร่วมเจริญพัฒนา ROU',company:'บมจ.ร่วมเจริญพัฒนา ROU',b1:17554.24,b2:0,b3:0,b4:0,b5:0,total:17554.24,unpaid:0,deposit:272048},
+    {branch:'DVB',shop:'บจก. แจลลุกซ์ เอเซีย',company:'บจก. แจลลุกซ์ เอเซีย',b1:54267.05,b2:0,b3:0,b4:0,b5:0,total:54267.05,unpaid:0,deposit:427464.5},
+    {branch:'DVB',shop:'บจก. อีโวลท์ เทคโนโลยี',company:'บจก. อีโวลท์ เทคโนโลยี',b1:1500,b2:0,b3:0,b4:0,b5:0,total:1500,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก. มาซารุ ชาบู ดีไซน์',company:'บจก. มาซารุ ชาบู ดีไซน์',b1:192582.14,b2:0,b3:0,b4:0,b5:0,total:192582.14,unpaid:0,deposit:390782},
+    {branch:'DVB',shop:'บจก.ยูนิโคล่ (ประเทศไทย)',company:'บจก.ยูนิโคล่ (ประเทศไทย)',b1:104707.02,b2:0,b3:0,b4:0,b5:0,total:104707.02,unpaid:0,deposit:4937300},
+    {branch:'DVB',shop:'บจก.วินโดว์ ทรีทเมนท์ โซลูซันส์',company:'บจก.วินโดว์ ทรีทเมนท์ โซลูซันส์',b1:9762.41,b2:0,b3:0,b4:0,b5:0,total:9762.41,unpaid:0,deposit:333101},
+    {branch:'DVB',shop:'บจก.ไฮแคร์ เฮลท์',company:'บจก.ไฮแคร์ เฮลท์',b1:44812.94,b2:0,b3:0,b4:0,b5:0,total:44812.94,unpaid:0,deposit:271392},
+    {branch:'DVB',shop:'บจก.วราภรณ์ สมพงษ์ ฟู้ดส์',company:'บจก.วราภรณ์ สมพงษ์ ฟู้ดส์',b1:48619.12,b2:0,b3:0,b4:0,b5:0,total:48619.12,unpaid:0,deposit:144724.7},
+    {branch:'DVB',shop:'บจก.ไวท์แค็ตตาล็อค',company:'บจก.ไวท์แค็ตตาล็อค',b1:10789.47,b2:51571.92,b3:0,b4:0,b5:0,total:62361.39,unpaid:0,deposit:174872},
+    {branch:'DVB',shop:'บจก. ซิกเนเจอร์ โกลบอล ROU',company:'บจก. ซิกเนเจอร์ โกลบอล ROU',b1:192902.33,b2:198481.24,b3:203413.09,b4:164341.7,b5:479203.36,total:1238341.72,unpaid:1238341.72,deposit:393656},
+    {branch:'DVB',shop:'บจก. เซเดอร์เร่',company:'บจก. เซเดอร์เร่',b1:0,b2:0,b3:0,b4:0,b5:41895,total:41895,unpaid:41895,deposit:0},
+    {branch:'DVB',shop:'บจก. อาฟเตอร์ ยู',company:'บจก. อาฟเตอร์ ยู',b1:50983.68,b2:0,b3:0,b4:0,b5:0,total:50983.68,unpaid:0,deposit:215217.5},
+    {branch:'DVB',shop:'บจก.คอฟฟี่ คอนเซ็ปต์ รีเทล GP',company:'บจก.คอฟฟี่ คอนเซ็ปต์ รีเทล GP',b1:89439.12,b2:0,b3:0,b4:0,b5:0,total:89439.12,unpaid:0,deposit:308400},
+    {branch:'DVB',shop:'บจก. กาแล็กซี่ฟิตเนส ROU',company:'บจก. กาแล็กซี่ฟิตเนส ROU',b1:752805.04,b2:763805.95,b3:0,b4:0,b5:0,total:1516610.99,unpaid:1516610.99,deposit:1374200},
+    {branch:'DVB',shop:'บจก. ไอเบอร์รี่ โฮมเมด',company:'บจก. ไอเบอร์รี่ โฮมเมด',b1:150413.52,b2:288524.65,b3:0,b4:0,b5:0,total:438938.17,unpaid:0,deposit:476921},
+    {branch:'DVB',shop:'บจก. แอล เอ็น จีฟู้ดโปรดักส์',company:'บจก. แอล เอ็น จีฟู้ดโปรดักส์',b1:39565.23,b2:0,b3:0,b4:0,b5:0,total:39565.23,unpaid:0,deposit:248261},
+    {branch:'DVB',shop:'บจก. เดอะไลฟ์แคร์ ROU',company:'บจก. เดอะไลฟ์แคร์ ROU',b1:20753.13,b2:0,b3:0,b4:0,b5:0,total:20753.13,unpaid:0,deposit:421368.8},
+    {branch:'DVB',shop:'บจก. เฉิน บราเธอร์',company:'บจก. เฉิน บราเธอร์',b1:21931.05,b2:0,b3:0,b4:0,b5:0,total:21931.05,unpaid:0,deposit:485270},
+    {branch:'DVB',shop:'บจก. พฤกษาคลีนิค โฮลดิ้ง',company:'บจก. พฤกษาคลีนิค โฮลดิ้ง',b1:40542.5,b2:0,b3:0,b4:0,b5:0,total:40542.5,unpaid:0,deposit:664114.4},
+    {branch:'DVB',shop:'บจก. 246 คาร์ วอช ไวบซ ROU',company:'บจก. 246 คาร์ วอช ไวบซ ROU',b1:10664.56,b2:0,b3:0,b4:0,b5:0,total:10664.56,unpaid:0,deposit:325706},
+    {branch:'DVB',shop:'บจก. บลู ฟลอริช',company:'บจก. บลู ฟลอริช',b1:145.05,b2:0,b3:0,b4:0,b5:0,total:145.05,unpaid:0,deposit:10000},
+    {branch:'DVB',shop:'บจก. พัทยา อินเตอร์',company:'บจก. พัทยา อินเตอร์',b1:25285.8,b2:0,b3:0,b4:0,b5:180928.98,total:206214.78,unpaid:206214.78,deposit:0},
+    {branch:'DVB',shop:'คุณอภิวัฒน์ โยลัย',company:'คุณอภิวัฒน์ โยลัย',b1:0,b2:0,b3:0,b4:0,b5:487550,total:487550,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก. สตาร์มาร์คแมนูแฟคเชอร์ริง',company:'บจก. สตาร์มาร์คแมนูแฟคเชอร์ริง',b1:17225.66,b2:151679.76,b3:0,b4:0,b5:0,total:168905.42,unpaid:0,deposit:455834},
+    {branch:'DVB',shop:'บจก. จีเอซี เอนเนอยี่ เทคโนโลยี',company:'บจก. จีเอซี เอนเนอยี่ เทคโนโลยี',b1:13716.34,b2:0,b3:0,b4:0,b5:0,total:13716.34,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก.ซันโกรว์ รีนิว เอเบิลส์',company:'บจก.ซันโกรว์ รีนิว เอเบิลส์',b1:18295.66,b2:0,b3:0,b4:0,b5:0,total:18295.66,unpaid:0,deposit:183000},
+    {branch:'DVB',shop:'คุณธิติการ เทศไทสง',company:'คุณธิติการ เทศไทสง',b1:10132.24,b2:0,b3:0,b4:0,b5:0,total:10132.24,unpaid:0,deposit:95898},
+    {branch:'DVRD',shop:'ร้าน 7-Eleven SH-A101A',company:'บริษัท ซีพี ออลล์ จำกัด (มหาชน)',b1:125881.7,b2:0,b3:0,b4:0,b5:33115.5,total:158997.2,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน โอจัง SH-A103',company:'บริษัท โอ จัง ยาคินิคุ จำกัด',b1:64513.5,b2:80710.28,b3:82915.45,b4:145042.21,b5:1264430.75,total:1637612.19,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ลิ้มเหล่าโหงว SH-A104',company:'บริษัท แอล เอ็น จี ฟู๊ด โปรดักส์ จำกัด',b1:0,b2:48432.5,b3:48432.5,b4:80038.7,b5:476249.34,total:653153.04,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ทูดาริ (SH-A104)',company:'บริษัท ทูดาริ เอฟบีซี จำกัด',b1:64712.5,b2:106531.5,b3:71703,b4:0,b5:121783.5,total:364730.5,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ก๋วยเตี๋ยวเรือวัดไทร SH-A10',company:'บริษัท ไลฟ์สไตล์ ฟู้ด จำกัด',b1:0,b2:46099.2,b3:83563.92,b4:82752.96,b5:623205.49,total:835621.57,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน Hey Coffee (OP-A101-102)',company:'บริษัท ริช เอ็กซ์เพรส (ไทยแลนด์) จำกัด',b1:77200.5,b2:0,b3:79154.36,b4:72225,b5:670020,total:898599.86,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'บจก.รวยเป็นร้าน',company:'บจก.รวยเป็นร้าน',b1:98396.2,b2:98396.2,b3:98396.2,b4:98396.2,b5:912196.24,total:1305781.04,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'โอชาม ข้าวต้มแห้ง (SH-A207-208)',company:'บริษัท รุ่งทรัพย์ 168 จำกัด',b1:64456.7,b2:64456.7,b3:64456.7,b4:0,b5:131981.85,total:325351.95,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Maru Waffle (OP-A201)',company:'นางสาวญาณี พิมุขมนัสกิจ',b1:21400,b2:22099.93,b3:0,b4:0,b5:717.3,total:44217.23,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Yoguruto (OP-A202)',company:'นางพสุมนต์ อิงคุทานนท์',b1:0,b2:0,b3:0,b4:0,b5:557.9,total:557.9,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:"I'm Dental Studio (SH-A305)",company:'บริษัท ไอแอมเด็นทัลสตูดิโอ (รัชดา) จำกัด',b1:0,b2:0,b3:0,b4:0,b5:4582.75,total:4582.75,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Felizia Nails (SH-A308)',company:'บริษัท เฟลิเนลล์ จำกัด',b1:193255.2,b2:105991.94,b3:100174.2,b4:70244.05,b5:752647.81,total:1222313.2,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Rolling Roaster (GP) (SH-C101)',company:'บริษัท 999 คิดบวก จำกัด',b1:0,b2:53900.21,b3:54812.46,b4:0,b5:43114.6,total:151827.27,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Private Fitness (SH-A301)',company:'บริษัท วีทีพี สามสิบสอง กรุ๊ป จำกัด',b1:304028,b2:304028,b3:304028,b4:276991.6,b5:2894709.5,total:4083785.1,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Recovery me (SH-A303)',company:'บริษัท วันดีดี สตอรี่ จำกัด',b1:77681.8,b2:0,b3:0,b4:0,b5:0,total:77681.8,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Brewave (GP) (SH-A201-202)',company:'บริษัท บุญเวฟ จำกัด',b1:0,b2:125217.82,b3:189266.88,b4:182684.89,b5:585203.67,total:1082373.26,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Tianzhi (OP-A104)',company:'บริษัท เถียนจื้อ ฟู้ดแอนด์เบฟเวอเรจ จำกัด',b1:26750,b2:26750,b3:26750,b4:33945.75,b5:379243.32,total:493439.07,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'How To Clinic',company:'บจก.ฮาว ทู เอส เมดดิคอล',b1:0,b2:0,b3:0,b4:0,b5:23400,total:23400,unpaid:0,deposit:0},
+  
+  ],
+  Apr: [
+    {branch:'DVRP',shop:'Fur Figure',company:'บจก.คณานับ อินทิเรียฯ',b1:55804,b2:58495,b3:58645,b4:55804,b5:55804,total:284553,unpaid:196330,deposit:196330},
+    {branch:'DVRP',shop:'Greenery',company:'บจก.กรีนเนอรี โปรดักส์',b1:101286,b2:3536,b3:0,b4:0,b5:0,total:104822,unpaid:0,deposit:338000},
+    {branch:'DVRP',shop:'Tonari',company:'บจก.ไอเอ็มซีเอฟ',b1:55533,b2:71679,b3:15713,b4:8130,b5:0,total:151055,unpaid:0,deposit:150000},
+    {branch:'DVP',shop:'EV Charger',company:'',b1:1500,b2:0,b3:0,b4:0,b5:0,total:1500,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Starmark',company:'สตาร์มาร์คแมนูแฟคเชอร์รี',b1:74305,b2:0,b3:0,b4:0,b5:0,total:74305,unpaid:0,deposit:206400},
+    {branch:'DVP',shop:'Kyodai Ramen',company:'',b1:34238,b2:0,b3:0,b4:0,b5:0,total:34238,unpaid:0,deposit:90000},
+    {branch:'DVK',shop:'Red Panda',company:'บจก.เรดแพนด้าเดเอ็น',b1:111361,b2:154565,b3:37535,b4:0,b5:0,total:303461,unpaid:0,deposit:334084},
+    {branch:'DVK',shop:'สยามแหนมเนือง',company:'คุณจินตนา ธรรมรสเดชา',b1:0,b2:35937,b3:37439,b4:73282,b5:308038,total:454696,unpaid:454696,deposit:384084},
+    {branch:'DVK',shop:"Bellinee's",company:'บมจ.ซีพี ออลล์',b1:0,b2:0,b3:0,b4:0,b5:3629,total:3629,unpaid:3629,deposit:207245},
+    {branch:'DVK',shop:'MLK',company:'บจก.ไมเนอร์ ไลฟ์สไตล์',b1:60513,b2:0,b3:0,b4:0,b5:0,total:60513,unpaid:0,deposit:181539},
+    {branch:'DVK',shop:'CDA',company:'บจก.ซีดิเอ-โปรออดิโอ',b1:0,b2:0,b3:0,b4:0,b5:8777,total:8777,unpaid:8777,deposit:388050},
+    {branch:'DVK',shop:'Starmark',company:'บจก.สตาร์มาร์คแมนูแฟคเชอร์รี',b1:140815,b2:3457,b3:0,b4:0,b5:0,total:144272,unpaid:0,deposit:208200},
+    {branch:'DVK',shop:'Bloom Nail Spa',company:'บจก.บลูมมิ่ง เวลเนส',b1:25407,b2:0,b3:0,b4:0,b5:0,total:25407,unpaid:0,deposit:134000},
+    {branch:'DVK',shop:'QQ Dressert',company:'บจก.คิวโอแอล เอ็นเตอร์ไพรเซส',b1:17366,b2:0,b3:0,b4:0,b5:0,total:17366,unpaid:0,deposit:52098},
+    {branch:'DVK',shop:'Fiber Connex',company:'บจก.ไฟเบอร์คอนเนคส์',b1:0,b2:0,b3:450710,b4:0,b5:0,total:450710,unpaid:0,deposit:41570},
+    {branch:'DVK',shop:'A Tiara Jewelry',company:'คุณสำรวงษ์ หูลนุช',b1:35310,b2:36287,b3:0,b4:0,b5:0,total:71597,unpaid:0,deposit:68800},
+    {branch:'DVRD',shop:'ร้าน 7-Eleven SH-A101A',company:'บริษัท ซีพี ออลล์ จำกัด (มหาชน)',b1:13910,b2:0,b3:0,b4:0,b5:33115.5,total:47025.5,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน โอจัง SH-A103',company:'บริษัท โอ จัง ยาคินิคุ จำกัด',b1:149652.1,b2:142955.44,b3:144448.88,b4:146654.05,b5:1409472.96,total:1993183.43,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ลิ้มเหล่าโหงว SH-A104',company:'บริษัท แอล เอ็น จี ฟู๊ด โปรดักส์ จำกัด',b1:0,b2:0,b3:48432.5,b4:48432.5,b5:484092.98,total:580957.98,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ทูดาริ (SH-A104)',company:'บริษัท ทูดาริ เอฟบีซี จำกัด',b1:0,b2:64712.5,b3:106531.5,b4:0,b5:68006.25,total:239250.25,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ก๋วยเตี๋ยวเรือวัดไทร SH-A10',company:'บริษัท ไลฟ์สไตล์ ฟู้ด จำกัด',b1:0,b2:0,b3:46099.2,b4:83563.92,b5:492956.85,total:622619.97,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน Hey Coffee (OP-A101-102)',company:'บริษัท ริช เอ็กซ์เพรส (ไทยแลนด์) จำกัด',b1:77200.5,b2:0,b3:0,b4:72225,b5:620265,total:769690.5,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'บจก.รวยเป็นร้าน',company:'บจก.รวยเป็นร้าน',b1:98396.2,b2:98396.2,b3:98396.2,b4:98396.2,b5:188694.47,total:582279.27,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'โอชาม ข้าวต้มแห้ง (SH-A207-208)',company:'บริษัท รุ่งทรัพย์ 168 จำกัด',b1:64456.7,b2:76105.62,b3:64456.7,b4:64456.7,b5:162697.15,total:432172.87,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Maru Waffle (OP-A201)',company:'นางสาวญาณี พิมุขมนัสกิจ',b1:21400,b2:22058.54,b3:0,b4:0,b5:0,total:43458.54,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Yoguruto (OP-A202)',company:'นางพสุมนต์ อิงคุทานนท์',b1:0,b2:0,b3:0,b4:0,b5:557.9,total:557.9,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:"I'm Dental Studio (SH-A305)",company:'บริษัท ไอแอมเด็นทัลสตูดิโอ (รัชดา) จำกัด',b1:0,b2:0,b3:0,b4:0,b5:4582.75,total:4582.75,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Felizia Nails (SH-A308)',company:'บริษัท เฟลิเนลล์ จำกัด',b1:100174.2,b2:105330.35,b3:105991.94,b4:100174.2,b5:306965.06,total:718635.75,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Rolling Roaster (GP) (SH-C101)',company:'บริษัท 999 คิดบวก จำกัด',b1:0,b2:67941.17,b3:53900.21,b4:54812.46,b5:43114.6,total:219768.44,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Private Fitness (SH-A301)',company:'บริษัท วีทีพี สามสิบสอง กรุ๊ป จำกัด',b1:309378,b2:411206.56,b3:304028,b4:304028,b5:2955409.9,total:4284050.46,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Recovery me (SH-A303)',company:'บริษัท วันดีดี สตอรี่ จำกัด',b1:77681.8,b2:0,b3:0,b4:0,b5:0,total:77681.8,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Brewave (GP) (SH-A201-202)',company:'บริษัท บุญเวฟ จำกัด',b1:0,b2:115015.52,b3:125217.82,b4:189266.88,b5:625431.18,total:1054931.4,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Tianzhi (OP-A104)',company:'บริษัท เถียนจื้อ ฟู้ดแอนด์เบฟเวอเรจ จำกัด',b1:0,b2:0,b3:0,b4:0,b5:379243.32,total:379243.32,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'How To Clinic',company:'บจก.ฮาว ทู เอส เมดดิคอล',b1:0,b2:0,b3:0,b4:0,b5:23400,total:23400,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'คุณศรีจิตรา วัชระไพโรจน์',company:'คุณศรีจิตรา วัชระไพโรจน์',b1:26277.5,b2:1397.69,b3:0,b4:0,b5:0,total:27675.19,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'บริษัท พรีคาสท์พรีโฮม จำกัด',company:'บริษัท พรีคาสท์พรีโฮม จำกัด',b1:0,b2:7019.78,b3:0,b4:0,b5:0,total:7019.78,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'บริษัท มัมมามิย่า แฮร์คลับ จำกัด',company:'บริษัท มัมมามิย่า แฮร์คลับ จำกัด',b1:17641.15,b2:23053.62,b3:0,b4:0,b5:0,total:40694.77,unpaid:0,deposit:0},
+  
+  ],
+  May: [
+    // DVRP
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'TONARI COFFEE HOUSE',company:'บจก.ไอเอ็มซีเอฟ',b1:55533.0,b2:73642.38,b3:71678.8,b4:15713.19,b5:8129.83,total:224697.2,unpaid:1,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'EASY HOME',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'ZEDERE',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'FUR FIGURE',company:'บจก.คณานับ อินทิเรียฯ',b1:55804.3,b2:58394.37,b3:58495.35,b4:58645.15,b5:111608.6,total:342947.77,unpaid:1,deposit:0},
+    {branch:'DVRP',shop:'GREENERY',company:'บจก.กรีนเนอรี่ โปรดักส์',b1:101285.5,b2:3645.36,b3:0.0,b4:0.0,b5:0.0,total:104930.86,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'GREENERY',company:'บจก.กรีนเนอรี่ โปรดักส์',b1:101285.5,b2:3645.36,b3:0.0,b4:0.0,b5:0.0,total:104930.86,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'JAS MODERN',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'JAS MODERN',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Closed Deal',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVRP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    // DVP
+    {branch:'DVP',shop:'ชินไฉฮั้ว',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'ATM KBANK',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'The Pizza Company',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Chester\'s',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'SAVE DRUG',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Twinkle Tunes',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Twinkle Tunes',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Jasmine nails and lash',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Jasmine nails and lash',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Uniqlo',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Wine Connention',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Swensen\'s',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Swensen\'s (Terrace)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'MAGURO',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Salad Factory',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Salad Factory',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Salad Factory',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'KT OPTIC',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'KT OPTIC',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Zwilling',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Zwilling',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Zwilling (Stock)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Kyodai Ramen',company:'',b1:34216.06,b2:0.0,b3:0.0,b4:0.0,b5:0.0,total:34216.06,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'เปามาลี',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Yoguruto',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'O-li-no Crepe&Tea',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Café Amazon',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Starmark',company:'สตาร์มาร์คแมนูแฟคเชอร์ริ่',b1:74106.17,b2:0.0,b3:0.0,b4:0.0,b5:0.0,total:74106.17,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Jas Sofa',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Jas Sofa',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'The Invent Clinic',company:'',b1:35888.83,b2:0.0,b3:0.0,b4:0.0,b5:0.0,total:35888.83,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Zedere',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Fitness Plus',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'ปอเก้า ล๊อตเตอรี่',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Starbucks Coffee',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Gourmet Market',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'ตู้กดอาหารเครื่องอื่ม 7-11',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    // DVK
+    {branch:'DVK',shop:'TOPS Supermarket',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'โอ้กะจู๋',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Watson (New Shop)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Red Panda Yakiniku',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Bellinee\'s Bake & Brew',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'MLK Connect (Zwilling)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'KT Optic',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant (Baby Face Clinic)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant (Baby Face Clinic)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Season Salon',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'QQ Dessert',company:'',b1:0,b2:0,b3:0,b4:0,b5:17366.1,total:17366.1,unpaid:1,deposit:0},
+    {branch:'DVK',shop:'Antie Anne\'s',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Check In Dress',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Coway',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'A-Tiara Jewely',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Cocowalk * รอกำหนดการ LS',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'ข้าวมันไก่อาม่า',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'ข้าวแกงคุณลุง',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'โอชามข้าวต้มแห้ง',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Kyodai Ramen',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'ปังสยาม พ.ศ.2515',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'หอม ขนมครก',company:'',b1:0,b2:0,b3:0,b4:0,b5:37238.56,total:37238.56,unpaid:1,deposit:0},
+    {branch:'DVK',shop:'ก๋วยเตี๋ยวไก่ตุ๋น กฤตยา',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Max Live Café\' (BuddyCal)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant หน้าห้องว่างChongmang',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Yoguruto',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Woodden',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Lifestyle (ฟรีค่าเช่า)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Fiber Connex (New Shop)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Fiber Connex (New Shop)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Lighting Center (ฟรีค่าเช่า)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Woodden (2)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'CDA',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Starmark*ร้านบิวอิน',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Reviv Clinic (Not Renew)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Zedere',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'The Bloom Nails Spa',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant Home D',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Maxxtec',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Utech',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Lighting Center (ตัดพื้นที่ออก)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Rester',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Starbucks coffee',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Sushi Hana (Vacant)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Shabu K.Mae (Vacant)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'BYD',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'The Fitness Platinum',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'The Fitness Platinum (01/06/26) New Shop',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'BBL',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'ตู้เอทีเอ็ม กสิกร',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Amazon',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Revenue',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'ARR (In Could Vacant)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Vacant',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'ARR (Ex Could Vacant)',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'%OCC',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'NLA',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'ONLA',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'VNLA',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'ARR',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'OCC',company:'',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก.บีทีวี ฟู้ด แอนด์ เบเวอเรจ',company:'บจก.บีทีวี ฟู้ด แอนด์ เบเวอเรจ',b1:8440.6,b2:0,b3:0,b4:0,b5:0,total:8440.6,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก. สยามอาร์ตมาเบิล',company:'บจก. สยามอาร์ตมาเบิล',b1:38697.23,b2:0,b3:0,b4:0,b5:0,total:38697.23,unpaid:0,deposit:689276.43},
+    {branch:'DVB',shop:'บมจ.ร่วมเจริญพัฒนา ROU',company:'บมจ.ร่วมเจริญพัฒนา ROU',b1:21397.95,b2:0,b3:0,b4:0,b5:0,total:21397.95,unpaid:0,deposit:272048},
+    {branch:'DVB',shop:'บจก. แจลลุกซ์ เอเซีย',company:'บจก. แจลลุกซ์ เอเซีย',b1:73465.55,b2:0,b3:0,b4:0,b5:0,total:73465.55,unpaid:0,deposit:427464.5},
+    {branch:'DVB',shop:'บจก. มาซารุ ชาบู ดีไซน์',company:'บจก. มาซารุ ชาบู ดีไซน์',b1:215560.62,b2:0,b3:0,b4:0,b5:0,total:215560.62,unpaid:0,deposit:390782},
+    {branch:'DVB',shop:'บจก.ยูนิโคล่ (ประเทศไทย)',company:'บจก.ยูนิโคล่ (ประเทศไทย)',b1:387999.83,b2:0,b3:0,b4:0,b5:0,total:387999.83,unpaid:0,deposit:4937300},
+    {branch:'DVB',shop:'บจก.วินโดว์ ทรีทเมนท์ โซลูซันส์',company:'บจก.วินโดว์ ทรีทเมนท์ โซลูซันส์',b1:11431.61,b2:0,b3:0,b4:0,b5:0,total:11431.61,unpaid:0,deposit:333101},
+    {branch:'DVB',shop:'บจก.ไฮแคร์ เฮลท์',company:'บจก.ไฮแคร์ เฮลท์',b1:50409.04,b2:0,b3:0,b4:0,b5:0,total:50409.04,unpaid:0,deposit:271392},
+    {branch:'DVB',shop:'บจก.วราภรณ์ สมพงษ์ ฟู้ดส์',company:'บจก.วราภรณ์ สมพงษ์ ฟู้ดส์',b1:53435.1,b2:0,b3:0,b4:0,b5:0,total:53435.1,unpaid:0,deposit:144724.7},
+    {branch:'DVB',shop:'บจก.ไวท์แค็ตตาล็อค',company:'บจก.ไวท์แค็ตตาล็อค',b1:12845.23,b2:41624,b3:0,b4:0,b5:0,total:54469.23,unpaid:0,deposit:174872},
+    {branch:'DVB',shop:'บจก. ซิกเนเจอร์ โกลบอล ROU',company:'บจก. ซิกเนเจอร์ โกลบอล ROU',b1:0,b2:1959.44,b3:88262.3,b4:191203.46,b5:336255.8,total:617681,unpaid:617681,deposit:393656},
+    {branch:'DVB',shop:'บจก. เซเดอร์เร่',company:'บจก. เซเดอร์เร่',b1:0,b2:0,b3:0,b4:0,b5:41895,total:41895,unpaid:41895,deposit:0},
+    {branch:'DVB',shop:'บจก. อาฟเตอร์ ยู',company:'บจก. อาฟเตอร์ ยู',b1:60376.82,b2:0,b3:0,b4:0,b5:0,total:60376.82,unpaid:0,deposit:215217.5},
+    {branch:'DVB',shop:'บจก.คอฟฟี่ คอนเซ็ปต์ รีเทล GP',company:'บจก.คอฟฟี่ คอนเซ็ปต์ รีเทล GP',b1:178804.22,b2:0,b3:0,b4:0,b5:0,total:178804.22,unpaid:0,deposit:308400},
+    {branch:'DVB',shop:'บจก. กาแล็กซี่ฟิตเนส ROU',company:'บจก. กาแล็กซี่ฟิตเนส ROU',b1:242854.64,b2:740343.66,b3:526600,b4:0,b5:0,total:1509798.3,unpaid:0,deposit:1374200},
+    {branch:'DVB',shop:'บจก. ไอเบอร์รี่ โฮมเมด',company:'บจก. ไอเบอร์รี่ โฮมเมด',b1:162005.36,b2:0,b3:0,b4:0,b5:0,total:162005.36,unpaid:0,deposit:476921},
+    {branch:'DVB',shop:'บจก. แอล เอ็น จีฟู้ดโปรดักส์',company:'บจก. แอล เอ็น จีฟู้ดโปรดักส์',b1:50064.25,b2:37005.05,b3:0,b4:0,b5:0,total:87069.3,unpaid:0,deposit:248261},
+    {branch:'DVB',shop:'บจก. เดอะไลฟ์แคร์ ROU',company:'บจก. เดอะไลฟ์แคร์ ROU',b1:25686.55,b2:0,b3:0,b4:0,b5:0,total:25686.55,unpaid:0,deposit:421368.8},
+    {branch:'DVB',shop:'บจก. เฉิน บราเธอร์',company:'บจก. เฉิน บราเธอร์',b1:21456.82,b2:0,b3:0,b4:0,b5:0,total:21456.82,unpaid:0,deposit:485270},
+    {branch:'DVB',shop:'บจก. พฤกษาคลีนิค โฮลดิ้ง',company:'บจก. พฤกษาคลีนิค โฮลดิ้ง',b1:46507.88,b2:0,b3:0,b4:0,b5:0,total:46507.88,unpaid:0,deposit:664114.4},
+    {branch:'DVB',shop:'บจก. 246 คาร์ วอช ไวบซ ROU',company:'บจก. 246 คาร์ วอช ไวบซ ROU',b1:11732.89,b2:0,b3:0,b4:0,b5:0,total:11732.89,unpaid:0,deposit:325706},
+    {branch:'DVB',shop:'บจก. บลู ฟลอริช',company:'บจก. บลู ฟลอริช',b1:168.79,b2:0,b3:0,b4:0,b5:0,total:168.79,unpaid:0,deposit:15000},
+    {branch:'DVB',shop:'บจก. พัทยา อินเตอร์',company:'บจก. พัทยา อินเตอร์',b1:28795.97,b2:0,b3:0,b4:0,b5:116045.47,total:144841.44,unpaid:144841.44,deposit:170400},
+    {branch:'DVB',shop:'คุณอภิวัฒน์ โยลัย',company:'คุณอภิวัฒน์ โยลัย',b1:0,b2:0,b3:0,b4:0,b5:487550,total:487550,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'บจก. สตาร์มาร์คแมนูแฟคเชอร์ริง',company:'บจก. สตาร์มาร์คแมนูแฟคเชอร์ริง',b1:19885.29,b2:153760.25,b3:0,b4:0,b5:0,total:173645.54,unpaid:0,deposit:455834},
+    {branch:'DVB',shop:'บจก.ซันโกรว์ รีนิว เอเบิลส์',company:'บจก.ซันโกรว์ รีนิว เอเบิลส์',b1:23570.76,b2:0,b3:0,b4:109453.3,b5:235229.87,total:368253.93,unpaid:0,deposit:183000},
+    {branch:'DVB',shop:'คุณธิติการ เทศไทสง',company:'คุณธิติการ เทศไทสง',b1:11274.46,b2:0,b3:0,b4:0,b5:0,total:11274.46,unpaid:0,deposit:95898},
+    {branch:'DVB',shop:'บจก. จีเอซี เอนเนอยี่ เทคโนโลยี',company:'บจก. จีเอซี เอนเนอยี่ เทคโนโลยี',b1:23667.22,b2:0,b3:0,b4:0,b5:0,total:23667.22,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน 7-Eleven SH-A101A',company:'บริษัท ซีพี ออลล์ จำกัด (มหาชน)',b1:0,b2:13910,b3:0,b4:0,b5:33115.5,total:47025.5,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน รสนิยม SH-A102',company:'บริษัท ไอเบอร์รี่ โฮมเมด จำกัด',b1:137636.4,b2:97185.46,b3:0,b4:0,b5:0,total:234821.86,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน โอจัง SH-A103',company:'บริษัท โอ จัง ยาคินิคุ จำกัด',b1:64513.5,b2:101354.82,b3:79216.84,b4:80710.28,b5:1364136.31,total:1689931.75,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ลิ้มเหล่าโหงว SH-A104',company:'บริษัท แอล เอ็น จี ฟู๊ด โปรดักส์ จำกัด',b1:0,b2:0,b3:0,b4:48432.5,b5:460330.42,total:508762.92,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ทูดาริ (SH-A104)',company:'บริษัท ทูดาริ เอฟบีซี จำกัด',b1:64712.5,b2:0,b3:64712.5,b4:0,b5:68006.25,total:197431.25,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน ก๋วยเตี๋ยวเรือวัดไทร SH-A10',company:'บริษัท ไลฟ์สไตล์ ฟู้ด จำกัด',b1:0,b2:0,b3:0,b4:46099.2,b5:385499.77,total:431598.97,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'ร้าน Hey Coffee (OP-A101-102)',company:'บริษัท ริช เอ็กซ์เพรส (ไทยแลนด์) จำกัด',b1:54361.35,b2:6949.19,b3:0,b4:0,b5:597795,total:659105.54,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'บริษัท มาย ฟุกุ มัทชะ จำกัด',company:'บริษัท มาย ฟุกุ มัทชะ จำกัด',b1:27616.7,b2:14685.2,b3:0,b4:0,b5:0,total:42301.9,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'บจก.รวยเป็นร้าน',company:'บจก.รวยเป็นร้าน',b1:0,b2:126526.6,b3:98396.2,b4:98396.2,b5:98396.2,total:421715.2,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'โอชาม ข้าวต้มแห้ง (SH-A207-208)',company:'บริษัท รุ่งทรัพย์ 168 จำกัด',b1:0,b2:77843.7,b3:76105.62,b4:64456.7,b5:196438.55,total:414844.57,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Maru Waffle (OP-A201)',company:'นางสาวญาณี พิมุขมนัสกิจ',b1:21400,b2:22111.4,b3:0,b4:0,b5:0,total:43511.4,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:"I'm Dental Studio (SH-A305)",company:'บริษัท ไอแอมเด็นทัลสตูดิโอ (รัชดา) จำกัด',b1:104249,b2:9344.33,b3:0,b4:0,b5:4582.75,total:118176.08,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Felizia Nails (SH-A308)',company:'บริษัท เฟลิเนลล์ จำกัด',b1:57264.5,b2:62514.54,b3:62420.65,b4:63082.24,b5:170104.96,total:415386.89,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Rolling Roaster (GP) (SH-C101)',company:'บริษัท 999 คิดบวก จำกัด',b1:0,b2:55342.74,b3:67941.17,b4:0,b5:0,total:123283.91,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Private Fitness (SH-A301)',company:'บริษัท วีทีพี สามสิบสอง กรุ๊ป จำกัด',b1:183963.24,b2:266256.94,b3:259041.8,b4:183963.24,b5:2814936.34,total:3708161.56,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Brewave (GP) (SH-A201-202)',company:'บริษัท บุญเวฟ จำกัด',b1:126804.83,b2:0,b3:115015.52,b4:125217.82,b5:730547.57,total:1097585.74,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'Tianzhi (OP-A104)',company:'บริษัท เถียนจื้อ ฟู้ดแอนด์เบฟเวอเรจ จำกัด',b1:26750,b2:0,b3:0,b4:0,b5:345297.57,total:372047.57,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'How To Clinic',company:'บจก.ฮาว ทู เอส เมดดิคอล',b1:0,b2:0,b3:0,b4:0,b5:23400,total:23400,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'คุณศรีจิตรา วัชระไพโรจน์',company:'คุณศรีจิตรา วัชระไพโรจน์',b1:0,b2:26277.5,b3:1397.69,b4:0,b5:0,total:27675.19,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'บริษัท พรีคาสท์พรีโฮม จำกัด',company:'บริษัท พรีคาสท์พรีโฮม จำกัด',b1:0,b2:0,b3:595,b4:0,b5:0,total:595,unpaid:0,deposit:0},
+    {branch:'DVRD',shop:'บริษัท มัมมามิย่า แฮร์คลับ จำกัด',company:'บริษัท มัมมามิย่า แฮร์คลับ จำกัด',b1:0,b2:25377.11,b3:23053.62,b4:0,b5:0,total:48430.73,unpaid:0,deposit:0},
+  ],
+  Jun: [
+    {branch:'DVRP',shop:'Fur Figure',company:'บจก.คณานับ อินทิเรียฯ',b1:0,b2:58394.37,b3:58495.35,b4:58645.15,b5:170253.75,total:345788.62,unpaid:345788.62,deposit:196330},
+    {branch:'DVRP',shop:'Greenery',company:'บจก.กรีนเนอรี่ โปรดักส์',b1:107929.65,b2:0,b3:0,b4:0,b5:0,total:107929.65,unpaid:0,deposit:338000},
+    {branch:'DVRP',shop:'Tonari',company:'บจก.ไอเอ็มซีเอฟ',b1:60433,b2:16950.26,b3:0,b4:0,b5:0,total:77383.26,unpaid:0,deposit:150000},
+    {branch:'DVRP',shop:'Zedere',company:'บจก.เซเดอร์เร่',b1:79607.47,b2:0,b3:0,b4:0,b5:0,total:79607.47,unpaid:0,deposit:123600},
+    {branch:'DVP',shop:'Uniqlo',company:'ยูนิโคล่(ประเทศไทย)',b1:3016,b2:0,b3:0,b4:0,b5:0,total:3016,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Zwilling',company:'บจก.ไมเนอร์ ไลฟ์สไตล์',b1:6266,b2:0,b3:0,b4:0,b5:0,total:6266,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'The Pizza Company',company:'บมจ.เดอะ ไมเนอร์ ฟู้ด กรุ๊ป',b1:6604,b2:0,b3:0,b4:0,b5:0,total:6604,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'ชินไฉฮั้ว',company:'บจก.ลัลนสิริ',b1:3016,b2:0,b3:0,b4:0,b5:0,total:3016,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Starbucks Coffee',company:'บจก.คอฟฟี่ คอนเซ็ปต์ รีเทล',b1:12740,b2:0,b3:0,b4:0,b5:0,total:12740,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Salad Factory',company:'กรีน ฟู้ด แฟคทอรี่',b1:9620,b2:0,b3:0,b4:0,b5:0,total:9620,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Kyodai Ramen',company:'เคียวได ราเมน',b1:37423.06,b2:0,b3:0,b4:0,b5:0,total:37423.06,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Jas Sofa',company:'ไดมอนด์ โซฟา',b1:3250,b2:0,b3:0,b4:0,b5:0,total:3250,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'MAGURO',company:'มากุโระ กรุ๊ป',b1:6604,b2:0,b3:0,b4:0,b5:0,total:6604,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Chester\'s',company:'เชสเตอร์ฟู้ด',b1:3453,b2:0,b3:0,b4:0,b5:0,total:3453,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Swensen\'s',company:'บจก.เอจี อินฟินิตี้',b1:6604,b2:0,b3:0,b4:0,b5:0,total:6604,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Wine Connention',company:'ไวน์ คอนเน็คชั่น',b1:6266,b2:0,b3:0,b4:0,b5:0,total:6266,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'O-li-no Crepe&Tea',company:'ปิยพล ตัณฑ์ธนศิวะกุล',b1:17209.75,b2:0,b3:0,b4:0,b5:0,total:17209.75,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'The Invent Clinic',company:'บจก. เอ็น เจ กรุ๊ป 2026',b1:39329.43,b2:0,b3:0,b4:0,b5:0,total:39329.43,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Gourmet Market',company:'เดอะมอลล์ กรุ๊ป',b1:12740,b2:0,b3:0,b4:0,b5:0,total:12740,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'Fitness Plus',company:'ณัฐพงศ์ จริยะตระกูล',b1:6604,b2:0,b3:0,b4:0,b5:0,total:6604,unpaid:0,deposit:0},
+    {branch:'DVP',shop:'KT OPTIC',company:'กรุงไทยออพติค',b1:3588,b2:0,b3:0,b4:0,b5:0,total:3588,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Amazon',company:'บจก.บีทีวี ฟู้ด แอนด์ เบเวอเรจ',b1:8175.87,b2:0,b3:0,b4:0,b5:0,total:8175.87,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Lavaredo',company:'บจก. สยามอาร์ตมาเบิล',b1:141484.99,b2:0,b3:0,b4:0,b5:0,total:141484.99,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Top charoen',company:'บมจ.ร่วมเจริญพัฒนา ROU',b1:25112.73,b2:0,b3:0,b4:0,b5:0,total:25112.73,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'TEMPURA YAMAYA',company:'บจก. แจลลุกซ์ เอเซีย',b1:112943.82,b2:0,b3:0,b4:0,b5:0,total:112943.82,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Masaru shabu',company:'บจก. มาซารุ ชาบู ดีไซน์วิลเลจ บางนา',b1:302988.82,b2:0,b3:0,b4:0,b5:0,total:302988.82,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Uniqlo',company:'บจก.ยูนิโคล่ (ประเทศไทย)',b1:137239.73,b2:0,b3:0,b4:0,b5:0,total:137239.73,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Vichitr',company:'บจก.วินโดว์ ทรีทเมนท์ โซลูซันส์',b1:55632.32,b2:0,b3:0,b4:0,b5:0,total:55632.32,unpaid:55632.32,deposit:0},
+    {branch:'DVB',shop:'Pharmax',company:'บจก.ไฮแคร์ เฮลท์',b1:121944.2,b2:0,b3:0,b4:0,b5:0,total:121944.2,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'วราภรณ์ ซาลาเปา',company:'บจก.วราภรณ์ สมพงษ์ ฟู้ดส์',b1:74200.55,b2:0,b3:0,b4:0,b5:0,total:74200.55,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Wines catalog',company:'บจก.ไวท์แค็ตตาล็อค',b1:32541.59,b2:55332.75,b3:0,b4:0,b5:0,total:87874.34,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Signature bkk',company:'บจก. ซิกเนเจอร์ โกลบอล ROU',b1:0,b2:0,b3:17367.44,b4:72854.3,b5:527459.26,total:617681,unpaid:0,deposit:617681},
+    {branch:'DVB',shop:'Zedere',company:'บจก. เซเดอร์เร่',b1:0,b2:0,b3:0,b4:0,b5:41895,total:41895,unpaid:0,deposit:41895},
+    {branch:'DVB',shop:'After you',company:'บจก. อาฟเตอร์ ยู',b1:83200.57,b2:0,b3:0,b4:0,b5:0,total:83200.57,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Starbucks',company:'บจก.คอฟฟี่ คอนเซ็ปต์ รีเทล GP',b1:227537.48,b2:0,b3:0,b4:0,b5:0,total:227537.48,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Galaxy Fitness',company:'บจก. กาแล็กซี่ฟิตเนส ROU',b1:800313.67,b2:526600,b3:0,b4:0,b5:0,total:1326913.67,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'รสนิยม',company:'บจก. ไอเบอร์รี่ โฮมเมด',b1:238897.07,b2:0,b3:0,b4:0,b5:0,total:238897.07,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'ลิ้มเหล่าโหงว',company:'บจก. แอล เอ็น จีฟู้ดโปรดักส์',b1:76183.49,b2:37868.24,b3:37005.05,b4:0,b5:0,total:151056.78,unpaid:0,deposit:74873.29},
+    {branch:'DVB',shop:'Napassaree',company:'บจก.นภัสรีย์ เดอร์มแมจิก',b1:86347.04,b2:0,b3:0,b4:0,b5:0,total:86347.04,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Oppein',company:'บจก. เฉิน บราเธอร์',b1:95596.83,b2:0,b3:0,b4:0,b5:0,total:95596.83,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Pruksa clinic',company:'บจก. พฤกษาคลีนิค โฮลดิ้ง',b1:124469.8,b2:0,b3:0,b4:0,b5:0,total:124469.8,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Promakers',company:'บจก. 246 คาร์ วอช ไวบซ ROU',b1:38819.02,b2:0,b3:0,b4:0,b5:0,total:38819.02,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Coway',company:'บจก. บลู ฟลอริช',b1:180.03,b2:0,b3:0,b4:0,b5:0,total:180.03,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Gourmet Market',company:'บจก. เดอะมอลล์ กรุ๊ป GP',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'อรุณี แหนมเนือง',company:'บจก. พัทยา อินเตอร์',b1:43639.42,b2:40480.37,b3:0,b4:0,b5:116045.47,total:200165.26,unpaid:0,deposit:200165.26},
+    {branch:'DVB',shop:'Fiorenzo',company:'คุณอภิวัฒน์ โยลัย',b1:0,b2:0,b3:0,b4:0,b5:487550,total:487550,unpaid:0,deposit:487550},
+    {branch:'DVB',shop:'Starmark',company:'บจก. สตาร์มาร์คแมนูแฟคเชอร์ริง',b1:84987.99,b2:155163.29,b3:0,b4:0,b5:0,total:240151.28,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Sunhome',company:'บจก.ซันโกรว์ รีนิว เอเบิลส์',b1:82633,b2:0,b3:0,b4:0,b5:0,total:82633,unpaid:302202.83,deposit:0},
+    {branch:'DVB',shop:'Neko1',company:'คุณธิติการ เทศไทสง (ร้านตุ๊กาตาคีบ)',b1:19480.44,b2:0,b3:0,b4:0,b5:0,total:19480.44,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'กาแฟพันธุ์ไทย',company:'หจก.คลู คลู คอฟ',b1:5123.16,b2:0,b3:0,b4:0,b5:0,total:5123.16,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'AGC',company:'บจก. จีเอซี เอนเนอยี่ เทคโนโลยี',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'นีวาชูส์',company:'บจก.นีวาชูส์ EV. GP 15%',b1:7490.54,b2:0,b3:0,b4:0,b5:0,total:7490.54,unpaid:0,deposit:0},
+    {branch:'DVB',shop:'Daiso',company:'ไดโซ ซังเกียว',b1:36806.59,b2:0,b3:0,b4:0,b5:0,total:36806.59,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Red Panda',company:'บจก.เรดแพนด้าเคเอ้น',b1:111361.42,b2:41523.22,b3:0,b4:0,b5:0,total:152884.64,unpaid:0,deposit:334084.27},
+    {branch:'DVK',shop:'สยามแหนมเนื่อง',company:'คุณจินตนา ธรรมรสเดชา',b1:0,b2:35936.65,b3:37439.13,b4:73282.34,b5:308037.69,total:454695.81,unpaid:454695.81,deposit:384084.27},
+    {branch:'DVK',shop:"Bellinee's",company:'บมจ.ซีพี ออลล์',b1:0,b2:0,b3:0,b4:0,b5:3628.8,total:3628.8,unpaid:3628.8,deposit:207244.8},
+    {branch:'DVK',shop:'MLK',company:'บจก.ไมเนอร์ ไลฟ์สไตล์',b1:60512.91,b2:60512.91,b3:0,b4:0,b5:0,total:121025.82,unpaid:0,deposit:181538.7},
+    {branch:'DVK',shop:'Starmark',company:'บจก.สตาร์มาร์คแมนูแฟคเชอริ่ง',b1:140815.2,b2:3549.73,b3:0,b4:0,b5:0,total:144364.93,unpaid:0,deposit:208200},
+    {branch:'DVK',shop:'Bloom Nail Spa',company:'บจก.บลูมมิ่ง เวลเนส',b1:25406.5,b2:26334.09,b3:0,b4:0,b5:0,total:51740.59,unpaid:0,deposit:134000},
+    {branch:'DVK',shop:'The Fitness',company:'บจก.เดอะฟิตเนส แพลทที่นัม เกษตรนวมินทร์',b1:364645,b2:0,b3:0,b4:0,b5:0,total:364645,unpaid:0,deposit:793800},
+    {branch:'DVK',shop:'Fiber Connex',company:'บจก.ไฟเบอร์คอนเนคซ์',b1:0,b2:0,b3:450710,b4:0,b5:0,total:450710,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'A Tiara Jewelry',company:'คุณสพงษ์ พูลนุช',b1:35310,b2:36228.86,b3:0,b4:0,b5:0,total:71538.86,unpaid:0,deposit:68800},
+    {branch:'DVK',shop:'Coco Walk & Farm by Mom',company:'คุณเกศกัญญา นรารัตน์วิริยะ',b1:0,b2:0,b3:0,b4:0,b5:80557.5,total:80557.5,unpaid:80557.5,deposit:0},
+    {branch:'DVK',shop:'Kyodai Ramen',company:'บจก.เคียวได ราเมน',b1:18297,b2:8452.98,b3:0,b4:0,b5:0,total:26749.98,unpaid:0,deposit:54891},
+    {branch:'DVK',shop:'หอมขนมครก',company:'คุณศิริพรรณ รักเรือง',b1:17119.89,b2:20303.08,b3:0,b4:0,b5:0,total:37422.97,unpaid:0,deposit:34239.79},
+    {branch:'DVK',shop:'B2S',company:'บริษัท บีทูเอส จำกัด',b1:153500,b2:0,b3:0,b4:0,b5:0,total:153500,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'EcoWater',company:'บจก.เอ็น บราเธอร์ อินเตอร์เนชั่นแนล กรุ๊ป',b1:338820,b2:0,b3:0,b4:0,b5:0,total:338820,unpaid:0,deposit:0},
+    {branch:'DVK',shop:'Watsons',company:'บริษัท เซ็นทรัล วัตสัน จำกัด',b1:0,b2:357462,b3:0,b4:0,b5:0,total:357462,unpaid:0,deposit:80000},
+    {branch:'DVK',shop:'ฟีอเรนโซ่',company:'คุณอภิวัฒน์ โยธัย',b1:0,b2:0,b3:0,b4:0,b5:140000,total:140000,unpaid:140000,deposit:16050},
+    {branch:'DVRD',shop:'ร้าน 7-Eleven (SH-A101A)',company:'บริษัท ซีพี ออลล์ จำกัด (มหาชน)',b1:0,b2:0,b3:13910,b4:0,b5:33115.5,total:47025.5,unpaid:0,deposit:358050},
+    {branch:'DVRD',shop:'ร้านโอจัง (SH-A103)',company:'บริษัท โอ จัง ยาคินิคุ จำกัด',b1:67503.5,b2:92094.91,b3:101354.82,b4:79216.84,b5:1088736.99,total:1428907.06,unpaid:0,deposit:369000},
+    {branch:'DVRD',shop:'ร้านลิ้มเหล่าโหงว (SH-A104)',company:'บริษัท แอล เอ็น จี ฟู้ด โปรดักส์ จำกัด',b1:0,b2:0,b3:0,b4:0,b5:402232.86,total:402232.86,unpaid:0,deposit:228900},
+    {branch:'DVRD',shop:'ร้านทูดารี (SH-A104)',company:'บริษัท ทูดารี เอฟบีซี จำกัด',b1:0,b2:0,b3:0,b4:0,b5:68006.25,total:68006.25,unpaid:0,deposit:306900},
+    {branch:'DVRD',shop:'ร้านก๋วยเตี๋ยวเรือวัดไทร (SH-A10)',company:'บริษัท ไลฟ์สไตล์ ฟู้ด จำกัด',b1:0,b2:0,b3:0,b4:0,b5:296850.53,total:296850.53,unpaid:0,deposit:209999},
+    {branch:'DVRD',shop:'ร้าน Hey Coffee (OP-A101-102)',company:'บริษัท วิช อิ็คซ์เพรส (ไทยแลนด์) จำกัด',b1:0,b2:0,b3:0,b4:0,b5:440568,total:440568,unpaid:0,deposit:135000},
+    {branch:'DVRD',shop:'Maru Waffle (OP-A201)',company:'นางสาวญาณี พิมชมนัสกิจ',b1:21400,b2:22128.77,b3:0,b4:0,b5:0,total:43528.77,unpaid:0,deposit:60000},
+    {branch:'DVRD',shop:'Felizia Nails (SH-A308)',company:'บริษัท เฟลิเนลล์ จำกัด',b1:0,b2:5796.93,b3:0,b4:0,b5:0,total:5796.93,unpaid:0,deposit:310500},
+    {branch:'DVRD',shop:'Rolling Roaster (GP)',company:'บริษัท 999 คิดบวก จำกัด',b1:0,b2:55342.74,b3:67941.17,b4:0,b5:0,total:123283.91,unpaid:0,deposit:266000},
+    {branch:'DVRD',shop:'Private Fitness (SH-A301)',company:'บริษัท วีทีพี สามสิบสอง กรุ๊ป จำกัด',b1:189313.24,b2:91085.09,b3:304028,b4:304028,b5:2525773.1,total:3414227.43,unpaid:0,deposit:946800},
+    {branch:'DVRD',shop:'Recovery me (SH-A303)',company:'บริษัท วันดีดี สตอรี่ จำกัด',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:285600},
+    {branch:'DVRD',shop:'Brewave (GP) (SH-A201-202)',company:'บริษัท บุญเวฟ จำกัด',b1:191641.19,b2:126804.83,b3:0,b4:115015.52,b5:721398.46,total:1154860,unpaid:1154860,deposit:0},
+    {branch:'DVRD',shop:'Tianzhi (OP-A104)',company:'บริษัท เถียนจื้อ ฟู้ดแอนด์เบฟเวอเรจ จำกัด',b1:0,b2:0,b3:0,b4:0,b5:236363,total:236363,unpaid:0,deposit:107000},
+    {branch:'DVRD',shop:'How To Clinic',company:'บจก.สาว ทู เอส เมดดิคอล',b1:0,b2:0,b3:0,b4:0,b5:23400,total:23400,unpaid:0,deposit:249600},
+    {branch:'DVRD',shop:'Playsound',company:'คุณศรีจิตรา',b1:0,b2:26277.5,b3:1397.69,b4:0,b5:0,total:27675.19,unpaid:0,deposit:95700},
+    {branch:'DVRD',shop:'Hauser',company:'บริษัท พรีคาสท์พรีโฮม จำกัด',b1:0,b2:0,b3:0,b4:595,b5:0,total:595,unpaid:0,deposit:314070},
+    {branch:'DVRD',shop:'Mamma Mia Hair Club',company:'บริษัท มัมมามิย่า แฮร์คลับ จำกัด',b1:0,b2:0,b3:0,b4:0,b5:0,total:0,unpaid:0,deposit:96480},
+  ]
+};
+
+const discountActual = {
+  DVRP:[0,0,0,0,0,0],
+  DVP: [0,0,10000,10000,19675,19675],
+  DVK: [150701,150701,144874,140171,194471,203651],
+  DVB: [10000,140410,140410,120068,113610,74748],
+  DVRD:[308210,321110,311930,296470,454255,454255],
+};
+const discountBudget = {
+  Jan:{DVRP:0,DVP:0,DVK:194159,DVB:127892,DVRD:464208,Total:786259},
+  Feb:{DVRP:0,DVP:0,DVK:194159,DVB:127892,DVRD:464208,Total:786259},
+  Mar:{DVRP:57250,DVP:14645,DVK:194159,DVB:127892,DVRD:464208,Total:858154},
+  Apr:{DVRP:57250,DVP:14645,DVK:259297,DVB:132728,DVRD:464208,Total:928128},
+  May:{DVRP:57250,DVP:14645,DVK:259297,DVB:101708,DVRD:464208,Total:897108},
+  Jun:{DVRP:0,DVP:14645,DVK:259297,DVB:73108,DVRD:464208,Total:811258},
+};
+const brRevenue = {DVRP:5946445,DVP:37622569,DVK:50409266,DVB:42665884,DVRD:28118261,Total:164762425};
+
+// Net revenue after discount ("รวม รายได้" row), per branch, Jan-Jun 2026.
+// Source: cross-checked against Property Business Presentation June 2026.pptx (p.56-61,
+// "P&L รายสาขา และรวม") -- verified against DV Summary P&L_June 26.xlsx.
+// NOTE 1: the Excel workbook's DVRP/DVP branch sheets add two one-off June items
+// (รายได้ภาษีที่ดินและสิ่งปลูกสร้าง + รายได้ภาษีป้าย = ~151,441 for DVRP and ~1,614,036 for
+// DVP) into "รวม รายได้" for June, but the PPTX's own branch AND overall summary slides
+// exclude these one-off items from the recurring revenue total (and the overall total only
+// reconciles with the branch sum when they're excluded). We use the PPTX/core-recurring
+// figures below so branch sums tie to the company total; the one-off tax revenue is real
+// cash but reported separately, not part of recurring rent/CL/discount revenue.
+// NOTE 2: DVRD's Jun figures are IDENTICAL to May across every line item (rental, CL,
+// discount) in BOTH the PPTX and the Excel file -- confirmed (not just a stale-file issue)
+// that DVRD's June P&L has not actually been refreshed yet; June is a carry-forward value.
+const revenueNet = {
+  DVRP:[419350, 419071.29, 428071.29, 419596.52, 416000, 410750],
+  DVP: [2707331, 2736543, 2805581, 2888324.5, 2907544.22, 2930401.22],
+  DVK: [4008988.17, 3818366.25, 3673402, 3641625, 3160642, 3076328],
+  DVB: [3652053, 3913454, 3443538, 3497971, 3429799, 3356965],
+  DVRD:[1725340, 1735360.33, 1734267, 1760280, 1343995, 1343995],
+};
+// One-off revenue items (June only) excluded from revenueNet above, kept for reference/disclosure.
+const revenueOneOffJun = {
+  DVRP:{'รายได้ภาษีที่ดินและสิ่งปลูกสร้าง':12830.00,'รายได้ภาษีป้าย':138611.00},
+  DVP: {'รายได้ภาษีที่ดินและสิ่งปลูกสร้าง':1518070.00,'รายได้ภาษีป้าย':95966.00},
+};
+
+// ══════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════
+function fmt(v){
+  if(v===null||v===undefined||v===''||v===0) return '<span class="heat0">—</span>';
+  return Math.round(v).toLocaleString('th-TH');
+}
+function fmtRaw(v){return Math.round(v||0).toLocaleString('th-TH');}
+function fmtM(v){return (v/1e6).toFixed(2)+'M';}
+function pctStr(a,b){if(!b) return '—'; return ((a/b)*100).toFixed(1)+'%';}
+
+function momBadge(curr,prev,inline=false){
+  if(prev===null||prev===undefined) return inline?'':'<td></td>';
+  const d=curr-prev;
+  if(Math.abs(d)<500) return inline?'<span class="eq" style="font-size:10px">→</span>':'<td><span class="eq" style="font-size:10px">→</span></td>';
+  const p=(prev>0?((d/prev)*100):0).toFixed(0);
+  const cls=d>0?'up':'dn';
+  const arrow=d>0?'▲':'▼';
+  return inline
+    ? `<span class="${cls}" style="font-size:10px">${arrow}${Math.abs(p)}%</span>`
+    : `<td><span class="${cls}" style="font-size:10px">${arrow}${Math.abs(p)}%</span></td>`;
+}
+
+function heatClass(v,max){
+  if(!v||v===0) return 'heat0';
+  const r=v/max;
+  if(r>0.6) return 'heat4';
+  if(r>0.3) return 'heat3';
+  if(r>0.05) return 'heat2';
+  return 'heat1';
+}
+
+// ══════════════════════════════════════════
+// RISK SCORING
+// ══════════════════════════════════════════
+function computeShopRisk(shopName, branch){
+  const MK=['Jan','Feb','Mar','Apr','May','Jun'];
+  let b5months=0, hasUnpaid=false, totalDebt=0;
+  const monthVals=[];
+  MK.forEach(mk=>{
+    const rows=(shopData[mk]||[]).filter(r=>r.branch===branch&&r.shop===shopName);
+    const row=rows[0];
+    if(!row){monthVals.push(0);return;}
+    if((row.b5||0)>0) b5months++;
+    if((row.unpaid||0)>0) hasUnpaid=true;
+    totalDebt+=(row.total||0);
+    monthVals.push(row.total||0);
+  });
+  let riskScore='low';
+  if(b5months>=3||(totalDebt>1000000&&b5months>0)) riskScore='high';
+  else if(b5months>=1||hasUnpaid) riskScore='medium';
+  const jan=monthVals[0]||0, latest=monthVals[5]||0;
+  let trend='stable';
+  if(jan>0){
+    if(latest>jan*1.1) trend='up';
+    else if(latest<jan*0.9) trend='down';
+  } else if(latest>0) trend='up';
+  return {riskScore,trend,totalDebt,b5months,hasUnpaid,monthVals};
+}
+
+function getRiskLabel(r){
+  if(r==='high') return '<span class="pill risk-hi">🔴 ความเสี่ยงสูง</span>';
+  if(r==='medium') return '<span class="pill risk-md">🟡 เฝ้าระวัง</span>';
+  return '<span class="pill risk-lo">🟢 ปกติ</span>';
+}
+
+// ══════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════
+function switchTab(name,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// TAB 1: OVERVIEW
+// ══════════════════════════════════════════
+function initOverview(){
+  // KPI cards — latest month (Jun) per branch with MoM vs Jan
+  const kpiRow=document.getElementById('kpi-overview');
+  const topColors={'DVRP':'#9B2335','DVP':'#1A5A8A','DVK':'#1A6640','DVB':'#8A3A00','DVRD':'#5B2D8E'};
+  kpiRow.innerHTML=BRANCHES.map(br=>{
+    const jun=agingSummary[br][5];
+    const jan=agingSummary[br][0];
+    const chg=jun-jan, chgPct=jan>0?((chg/jan)*100).toFixed(1):0;
+    const isUp=chg>0;
+    return `<div class="kpi-card" style="border-top-color:${topColors[br]}">
+      <div class="kpi-branch" style="color:${topColors[br]}">${br}</div>
+      <div class="kpi-name">${BR_NAMES[br]}</div>
+      <div class="kpi-val" style="color:${topColors[br]}">${fmtM(jun)}</div>
+      <div class="kpi-sub">
+        <span class="${isUp?'up':'dn'}">${isUp?'▲':'▼'} ${Math.abs(chgPct)}%</span>
+        <span style="color:var(--sub);font-size:10px">vs ม.ค.</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Overview table
+  const tbody=document.getElementById('tbody-overview');
+  let html=BRANCHES.map(br=>{
+    const vals=agingSummary[br];
+    const peakIdx=vals.indexOf(Math.max(...vals));
+    const mom=vals[5]-vals[4], momP=vals[4]>0?((mom/vals[4])*100).toFixed(1):0;
+    const chg=vals[5]-vals[0], chgP=vals[0]>0?((chg/vals[0])*100).toFixed(1):0;
+    const maxV=Math.max(...vals);
+    return `<tr>
+      <td><span class="pill br-${br}">${br} ${BR_NAMES[br]}</span></td>
+      ${vals.map((v)=>`<td class="${heatClass(v,maxV)}">${fmtRaw(v)}</td>`).join('')}
+      <td><span style="background:#F0EBF8;padding:2px 8px;border-radius:8px;font-size:10px">${MONTHS[peakIdx]}</span></td>
+      <td>${momBadge(vals[5],vals[4],true)}</td>
+      <td><span class="${chg>0?'up':'dn'}" style="font-size:11px;font-weight:700">${chg>0?'▲':'▼'}${Math.abs(chgP)}%</span></td>
+    </tr>`;
+  }).join('');
+  const totals=MONTHS_KEY.map(mk=>BRANCHES.reduce((s,br)=>s+(agingSummary[br][MONTHS_KEY.indexOf(mk)]||0),0));
+  const peakIdx=totals.indexOf(Math.max(...totals));
+  const mom=totals[5]-totals[4],momP=totals[4]>0?((mom/totals[4])*100).toFixed(1):0;
+  const chg=totals[5]-totals[0],chgP=totals[0]>0?((chg/totals[0])*100).toFixed(1):0;
+  html+=`<tr class="row-total">
+    <td><span class="pill br-Total">รวมทุกสาขา</span></td>
+    ${totals.map((v)=>`<td>${fmtRaw(v)}</td>`).join('')}
+    <td>${MONTHS[peakIdx]}</td>
+    <td>${momBadge(totals[5],totals[4],true)}</td>
+    <td><span class="${chg>0?'up':'dn'}">${chg>0?'▲':'▼'}${Math.abs(chgP)}%</span></td>
+  </tr>`;
+  tbody.innerHTML=html;
+
+  // Charts
+  const totLine=MONTHS.map((_,i)=>BRANCHES.reduce((s,br)=>s+(agingSummary[br][i]||0),0)/1e6);
+  new Chart(document.getElementById('c-overview-line'),{
+    type:'line',
+    data:{labels:MONTHS,datasets:[{label:'รวมทุกสาขา (฿ล้าน)',data:totLine,
+      borderColor:'#7C4DCC',backgroundColor:'rgba(124,77,204,.12)',
+      tension:.4,fill:true,pointRadius:5,pointBackgroundColor:'#7C4DCC'}]},
+    options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`฿${c.parsed.y.toFixed(2)}M`}}},
+      scales:{y:{ticks:{callback:v=>v.toFixed(1)+'M'}}}}
+  });
+  new Chart(document.getElementById('c-overview-stack'),{
+    type:'bar',
+    data:{labels:MONTHS,datasets:BRANCHES.map((br,i)=>({
+      label:br,
+      data:MONTHS_KEY.map(mk=>+(agingSummary[br][MONTHS_KEY.indexOf(mk)]/1e6).toFixed(3)),
+      backgroundColor:Object.values(BR_COLORS)[i],
+      borderColor:Object.values(BR_BORDER)[i],borderWidth:1,borderRadius:3,
+    }))},
+    options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>v+'M'}}},
+      plugins:{legend:{position:'right',labels:{font:{size:10}}}}}
+  });
+  const bkColors=['rgba(168,228,192,.85)','rgba(255,240,128,.85)','rgba(255,200,128,.85)','rgba(255,160,120,.85)','rgba(255,100,100,.85)'];
+  const bkLabels=['1–30วัน','31–60วัน','61–90วัน','91–120วัน','>120วัน'];
+  new Chart(document.getElementById('c-overview-bucket'),{
+    type:'bar',
+    data:{labels:MONTHS,datasets:[0,1,2,3,4].map(bi=>({
+      label:bkLabels[bi],
+      data:MONTHS_KEY.map(mk=>BRANCHES.reduce((s,br)=>s+(agingBuckets[mk][br][bi]||0),0)/1e6),
+      backgroundColor:bkColors[bi],borderRadius:2,
+    }))},
+    options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>v.toFixed(1)+'M'}}},
+      plugins:{legend:{position:'right',labels:{font:{size:10}}}}}
+  });
+}
+
+// ══════════════════════════════════════════
+// TAB 2: PER BRANCH
+// ══════════════════════════════════════════
+let branchCharts={line:null,bar:null};
+let currentBranch='DVRP';
+
+function switchBranch(br,el){
+  currentBranch=br;
+  document.querySelectorAll('#branch-btns .br-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderBranchTab(br);
+}
+
+function renderBranchTab(br){
+  document.getElementById('branch-chart-title').textContent=`Aging Bucket — ${br} (${BR_NAMES[br]})`;
+  document.getElementById('branch-trend-title').textContent=`หนี้คงค้างรวม — ${br} (${BR_NAMES[br]})`;
+  document.getElementById('branch-tbl-title').innerHTML=`<span class="badge badge-aging">Aging</span> รายละเอียด Bucket รายเดือน — ${br} (${BR_NAMES[br]})`;
+
+  const MK5=['Jan','Feb','Mar','Apr','May','Jun'];
+  const ML5=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.'];
+  const bkLabels=['1–30 วัน','31–60 วัน','61–90 วัน','91–120 วัน','>120 วัน','รวมค้าง'];
+  const bkColors=['rgba(168,228,192,.85)','rgba(255,240,128,.85)','rgba(255,200,120,.85)','rgba(255,160,120,.85)','rgba(255,100,100,.85)'];
+
+  // Destroy old charts
+  if(branchCharts.bar){branchCharts.bar.destroy();branchCharts.bar=null;}
+  if(branchCharts.line){branchCharts.line.destroy();branchCharts.line=null;}
+
+  branchCharts.bar=new Chart(document.getElementById('c-branch-bucket'),{
+    type:'bar',
+    data:{labels:ML5,datasets:[0,1,2,3,4].map(bi=>({
+      label:bkLabels[bi],
+      data:MK5.map(mk=>agingBuckets[mk][br][bi]||0),
+      backgroundColor:bkColors[bi],borderRadius:3,
+    }))},
+    options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1000)+'K':v}}},
+      plugins:{legend:{position:'right',labels:{font:{size:10}}}}}
+  });
+
+  branchCharts.line=new Chart(document.getElementById('c-branch-total'),{
+    type:'line',
+    data:{labels:ML5,datasets:[{
+      label:'หนี้คงค้างรวม (฿)',
+      data:MK5.map(mk=>agingSummary[br][MONTHS_KEY.indexOf(mk)]||0),
+      borderColor:BR_TEXT[br],backgroundColor:BR_COLORS[br]+'88',
+      tension:.4,fill:true,pointRadius:5,
+    }]},
+    options:{responsive:true,plugins:{legend:{display:false}},
+      scales:{y:{ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?Math.round(v/1000)+'K':v}}}}
+  });
+
+  // Bucket table
+  const tbody=document.getElementById('tbody-branch-bucket');
+  const bkCls=['bk1','bk2','bk3','bk4','bk5','bkt'];
+  let html=[0,1,2,3,4].map(bi=>{
+    const vals=MK5.map(mk=>agingBuckets[mk][br][bi]||0);
+    const chg=vals[vals.length-1]-vals[0],chgP=vals[0]>0?((chg/vals[0])*100).toFixed(1):0;
+    return `<tr>
+      <td><span class="pill ${bkCls[bi]}" style="padding:3px 12px">${bkLabels[bi]}</span></td>
+      ${vals.map(v=>`<td class="${bkCls[bi]}">${fmtRaw(v)}</td>`).join('')}
+      <td><span class="${chg>0?'up':'dn'}">${chg>0?'▲':'▼'}${Math.abs(chgP)}%</span></td>
+    </tr>`;
+  }).join('');
+  const totVals=MK5.map(mk=>agingSummary[br][MONTHS_KEY.indexOf(mk)]||0);
+  const tChg=totVals[totVals.length-1]-totVals[0],tP=totVals[0]>0?((tChg/totVals[0])*100).toFixed(1):0;
+  html+=`<tr class="row-total">
+    <td><span class="pill bkt">รวมค้างชำระ</span></td>
+    ${totVals.map(v=>`<td class="bkt">${fmtRaw(v)}</td>`).join('')}
+    <td><span class="${tChg>0?'up':'dn'}">${tChg>0?'▲':'▼'}${Math.abs(tP)}%</span></td>
+  </tr>`;
+  tbody.innerHTML=html;
+}
+
+// ══════════════════════════════════════════
+// TAB 3: SHOP DETAIL
+// ══════════════════════════════════════════
+let currentShopBranch='DVRP';
+let shopLineChart=null;
+
+function switchShopBranch(br,el){
+  currentShopBranch=br;
+  document.querySelectorAll('#panel-shop .br-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderShopTable();
+}
+
+function setShopFilter(v){
+  document.getElementById('shop-risk-filter').value=v==='unpaid'?'all':v;
+  renderShopTable();
+}
+
+function getShopCrossMonth(branch){
+  const MK5=['Jan','Feb','Mar','Apr','May','Jun'];
+  const shops={};
+  MK5.forEach((mk,mi)=>{
+    (shopData[mk]||[]).filter(r=>r.branch===branch).forEach(r=>{
+      if(!shops[r.shop]) shops[r.shop]={company:r.company||'',vals:[0,0,0,0,0,0],b5:[0,0,0,0,0,0],unpaid:[0,0,0,0,0,0]};
+      shops[r.shop].vals[mi]=r.total||0;
+      shops[r.shop].b5[mi]=r.b5||0;
+      shops[r.shop].unpaid[mi]=r.unpaid||0;
+      if(r.company) shops[r.shop].company=r.company;
+    });
+  });
+  return Object.entries(shops).map(([shop,d])=>{
+    const risk=computeShopRisk(shop,branch);
+    return {shop,company:d.company,vals:d.vals,b5:d.b5,unpaid:d.unpaid,...risk};
+  });
+}
+
+function renderShopTable(){
+  const br=currentShopBranch;
+  const riskFilter=document.getElementById('shop-risk-filter').value;
+  const sortBy=document.getElementById('shop-sort').value;
+  document.getElementById('shop-tbl-title').textContent=`สาขา ${br} (${BR_NAMES[br]})`;
+  document.getElementById('shop-chart-title').textContent=`Trend ยอดค้างรายร้าน — ${br}`;
+
+  let data=getShopCrossMonth(br);
+
+  // DVB Apr note: no Excel data
+  const dvbAprNA = (br==='DVB');
+
+  // Filter by risk
+  if(riskFilter!=='all') data=data.filter(d=>d.riskScore===riskFilter);
+
+  // Sort
+  const riskOrder={high:0,medium:1,low:2};
+  if(sortBy==='risk') data.sort((a,b)=>riskOrder[a.riskScore]-riskOrder[b.riskScore]||b.totalDebt-a.totalDebt);
+  else if(sortBy==='unpaid') data.sort((a,b)=>{
+    const au=a.unpaid.some(v=>v>0)?1:0,bu=b.unpaid.some(v=>v>0)?1:0;
+    return bu-au||(b.vals[5]||0)-(a.vals[5]||0);
+  });
+  else if(sortBy==='total-desc') data.sort((a,b)=>b.totalDebt-a.totalDebt);
+  else if(sortBy==='may-desc') data.sort((a,b)=>(b.vals[5]||0)-(a.vals[5]||0));
+  else if(sortBy==='trend-up') data.sort((a,b)=>((b.vals[5]||0)-(b.vals[0]||0))-((a.vals[5]||0)-(a.vals[0]||0)));
+  else data.sort((a,b)=>a.shop.localeCompare(b.shop,'th'));
+
+  // Stats
+  const allData=getShopCrossMonth(br);
+  const hiCount=allData.filter(d=>d.riskScore==='high').length;
+  const mdCount=allData.filter(d=>d.riskScore==='medium').length;
+  const unpaidCount=allData.filter(d=>d.unpaid.some(v=>v>0)).length;
+  const totalDebtBr=allData.reduce((s,d)=>s+(d.vals[5]||0),0); // latest month (Jun) snapshot, not Jan-Jun cumulative
+  document.getElementById('shop-stats').innerHTML=`
+    <div class="stat-card"><div class="stat-val">${allData.length}</div><div class="stat-lbl">ร้านค้าทั้งหมด</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#991B1B">${hiCount}</div><div class="stat-lbl">🔴 ความเสี่ยงสูง</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#92400E">${mdCount}</div><div class="stat-lbl">🟡 เฝ้าระวัง</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#E67E22">${unpaidCount}</div><div class="stat-lbl">⚠ ยังไม่นัดชำระ</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--lav-t)">${fmtM(totalDebtBr)}</div><div class="stat-lbl">หนี้รวมทุกร้าน (มิ.ย. 2569)</div></div>
+  `;
+
+  // Alert banner
+  if(unpaidCount>0){
+    document.getElementById('shop-alert').style.display='flex';
+    document.getElementById('shop-alert-text').textContent=`${br}: ${unpaidCount} ร้านยังไม่นัดชำระ (${((unpaidCount/allData.length)*100).toFixed(0)}% ของทั้งหมด)`;
+  } else document.getElementById('shop-alert').style.display='none';
+
+  document.getElementById('shop-count').textContent=`${data.length} ร้านค้า`;
+
+  // Heat max for coloring
+  const maxVal=Math.max(...data.flatMap(d=>d.vals));
+
+  const ML5=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.'];
+  let html=data.map(d=>{
+    const hasUnpaid=d.unpaid.some(v=>v>0);
+    const jan=d.vals[0]||0, may=d.vals[5]||0;
+    const chgAbs=may-jan, chgPct=jan>0?((chgAbs/jan)*100).toFixed(0):may>0?'new':'0';
+    const trendIcon=d.trend==='up'?'<span class="up trend-arrow">↑</span>':d.trend==='down'?'<span class="dn trend-arrow">↓</span>':'<span class="eq trend-arrow">→</span>';
+    return `<tr ${hasUnpaid?'style="background:#FFFAF4"':''}>
+      <td style="font-weight:600;white-space:nowrap">${d.shop}${hasUnpaid?'<span style="color:#E67E22;margin-left:4px;font-size:10px">⚠</span>':''}</td>
+      <td style="color:var(--sub);font-size:10px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${d.company}">${d.company||'—'}</td>
+      <td style="text-align:center">${getRiskLabel(d.riskScore)}</td>
+      ${d.vals.map((v,i)=>{
+        if(dvbAprNA&&i===3) return '<td class="na-cell">N/A</td>';
+        return `<td class="${heatClass(v,maxVal)}">${v?fmtRaw(v):'—'}</td>`;
+      }).join('')}
+      <td style="text-align:center">${trendIcon}</td>
+      <td style="text-align:center"><span class="${chgAbs>0?'up':chgAbs<0?'dn':'eq'}" style="font-weight:700;font-size:11px">${chgAbs>0?'+':''}${chgPct}%</span></td>
+    </tr>`;
+  }).join('');
+
+  // Total row
+  const totals=[0,1,2,3,4,5].map(i=>data.reduce((s,d)=>s+(d.vals[i]||0),0));
+  const tChg=totals[5]-totals[0],tP=totals[0]>0?((tChg/totals[0])*100).toFixed(1):0;
+  html+=`<tr class="row-total">
+    <td colspan="3"><span class="pill br-${br}">รวม ${data.length} ร้าน</span></td>
+    ${totals.map((v,i)=>{
+      if(dvbAprNA&&i===3) return '<td class="na-cell">N/A</td>';
+      return `<td>${fmtRaw(v)}</td>`;
+    }).join('')}
+    <td></td>
+    <td><span class="${tChg>0?'up':'dn'}">${tChg>0?'▲':'▼'}${Math.abs(tP)}%</span></td>
+  </tr>`;
+  document.getElementById('tbody-shop').innerHTML=html;
+
+  // Shop line chart — top 8 by totalDebt
+  const top=data.filter(d=>d.vals.some(v=>v>0)).sort((a,b)=>b.totalDebt-a.totalDebt).slice(0,8);
+  const palette=['#E91E63','#2196F3','#4CAF50','#FF9800','#9C27B0','#00BCD4','#FF5722','#607D8B'];
+  if(shopLineChart){shopLineChart.destroy();shopLineChart=null;}
+  if(top.length){
+    shopLineChart=new Chart(document.getElementById('c-shop-trend'),{
+      type:'line',
+      data:{labels:ML5,datasets:top.map((d,i)=>({
+        label:d.shop,data:d.vals,
+        borderColor:palette[i%palette.length],
+        backgroundColor:palette[i%palette.length]+'22',
+        tension:.4,pointRadius:4,fill:false,
+      }))},
+      options:{responsive:true,
+        scales:{y:{ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1000)+'K':v}}},
+        plugins:{legend:{position:'right',labels:{font:{size:10},boxWidth:12}}}}
+    });
+  }
+}
+
+// ══════════════════════════════════════════
+// TAB 4: DISCOUNT
+// ══════════════════════════════════════════
+function initDiscount(){
+  const topColors={DVRP:'#9B2335',DVP:'#1A5A8A',DVK:'#1A6640',DVB:'#8A3A00',DVRD:'#5B2D8E'};
+  const kpiDiv=document.getElementById('kpi-discount');
+  kpiDiv.innerHTML=BRANCHES.map(br=>{
+    const ytd=discountActual[br].reduce((s,v)=>s+v,0);
+    const bgPct=brRevenue[br]>0?((ytd/brRevenue[br])*100).toFixed(2):0;
+    return `<div class="kpi-card" style="border-top-color:${topColors[br]}">
+      <div class="kpi-branch" style="color:${topColors[br]}">${br}</div>
+      <div class="kpi-name">${BR_NAMES[br]}</div>
+      <div class="kpi-val" style="color:${topColors[br]}">${ytd>0?fmtM(ytd):'฿0'}</div>
+      <div class="kpi-sub"><span style="color:var(--sub)">${bgPct}% of BG Rev</span></div>
+    </div>`;
+  }).join('');
+
+  // Charts
+  const ML5=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.'];
+  const palette=[BR_COLORS.DVRP,BR_COLORS.DVP,BR_COLORS.DVK,BR_COLORS.DVB,BR_COLORS.DVRD];
+  new Chart(document.getElementById('c-disc-bar'),{
+    type:'bar',
+    data:{labels:ML5,datasets:BRANCHES.map((br,i)=>({
+      label:br,data:discountActual[br],
+      backgroundColor:palette[i],borderColor:Object.values(BR_BORDER)[i],borderWidth:1,borderRadius:4,
+    }))},
+    options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1000)+'K':v}}},
+      plugins:{legend:{position:'right',labels:{font:{size:10}}}}}
+  });
+
+  // Cumulative actual vs budget
+  const cumActual=BRANCHES.reduce((a,br)=>{
+    discountActual[br].forEach((v,i)=>a[i]=(a[i]||0)+v);return a;},[]);
+  const cumBudget=['Jan','Feb','Mar','Apr','May','Jun'].map(mk=>discountBudget[mk].Total);
+  let runA=0,runB=0;
+  const runActual=cumActual.map(v=>(runA+=v,runA));
+  const runBudget=cumBudget.map(v=>(runB+=v,runB));
+  new Chart(document.getElementById('c-disc-line'),{
+    type:'line',
+    data:{labels:ML5,datasets:[
+      {label:'Actual YTD',data:runActual,borderColor:'#4CAF50',backgroundColor:'rgba(76,175,80,.12)',tension:.4,fill:true,pointRadius:5},
+      {label:'Budget YTD',data:runBudget,borderColor:'#FF9800',backgroundColor:'rgba(255,152,0,.08)',tension:.4,borderDash:[6,3],fill:false,pointRadius:4},
+    ]},
+    options:{responsive:true,plugins:{legend:{position:'bottom'}},
+      scales:{y:{ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1000)+'K':v}}}}
+  });
+
+  // Actual table
+  const tbody=document.getElementById('tbody-disc-actual');
+  let html=BRANCHES.map(br=>{
+    const vals=discountActual[br];
+    const ytd=vals.reduce((s,v)=>s+v,0);
+    const bgPct=brRevenue[br]>0?((ytd/brRevenue[br])*100).toFixed(2):0;
+    return `<tr>
+      <td><span class="pill br-${br}">${br} ${BR_NAMES[br]}</span></td>
+      <td style="text-align:right">${fmtRaw(brRevenue[br])}</td>
+      ${vals.map(v=>`<td style="text-align:right">${v?fmtRaw(v):'—'}</td>`).join('')}
+      <td style="text-align:right;font-weight:700">${fmtRaw(ytd)}</td>
+      <td style="text-align:right">${bgPct}%</td>
+    </tr>`;
+  }).join('');
+  const totYTD=BRANCHES.reduce((s,br)=>s+discountActual[br].reduce((a,v)=>a+v,0),0);
+  const totRev=brRevenue.Total;
+  html+=`<tr class="row-total">
+    <td><span class="pill br-Total">รวม</span></td>
+    <td style="text-align:right">${fmtRaw(totRev)}</td>
+    ${[0,1,2,3,4,5].map(i=>`<td style="text-align:right">${fmtRaw(BRANCHES.reduce((s,br)=>s+(discountActual[br][i]||0),0))}</td>`).join('')}
+    <td style="text-align:right;font-weight:700">${fmtRaw(totYTD)}</td>
+    <td style="text-align:right">${((totYTD/totRev)*100).toFixed(2)}%</td>
+  </tr>`;
+  tbody.innerHTML=html;
+
+  // Budget table
+  const tbody2=document.getElementById('tbody-disc-budget');
+  const MK5=['Jan','Feb','Mar','Apr','May','Jun'];
+  html=BRANCHES.map(br=>{
+    const ytdActual=discountActual[br].reduce((s,v)=>s+v,0);
+    const ytdBudget=MK5.reduce((s,mk)=>s+(discountBudget[mk][br]||0),0);
+    // Balance = Budget - Discount(Actual). Negative -> red, otherwise unchanged (green, as before).
+    const balance=ytdBudget-ytdActual;
+    const balanceColor=balance<0?'#DC2626':'#0D6E2A';
+    return `<tr>
+      <td><span class="pill br-${br}">${br}</span></td>
+      <td style="text-align:right">${fmtRaw(brRevenue[br])}</td>
+      <td style="text-align:right">${fmtRaw(ytdBudget)}</td>
+      <td style="text-align:right;color:#0D6E2A;font-weight:600">${fmtRaw(ytdActual)}</td>
+      <td style="text-align:right;color:${balanceColor};font-weight:700">${balance<0?'-':'+'} ${fmtRaw(Math.abs(balance))}</td>
+      <td style="text-align:right">${brRevenue[br]>0?((ytdActual/brRevenue[br])*100).toFixed(2)+'%':'—'}</td>
+    </tr>`;
+  }).join('');
+  tbody2.innerHTML=html;
+}
+
+// ══════════════════════════════════════════
+// TAB: REVENUE
+// ══════════════════════════════════════════
+function initRevenue(){
+  const totals=MONTHS_KEY.map((mk,i)=>BRANCHES.reduce((s,br)=>s+(revenueNet[br][i]||0),0));
+  const junTotal=totals[5], mayTotal=totals[4];
+  const momPct=mayTotal>0?(((junTotal-mayTotal)/mayTotal)*100).toFixed(1):0;
+  const isUp=junTotal>=mayTotal;
+  const ytdTotal=totals.reduce((a,b)=>a+b,0);
+  const topBr=BRANCHES.reduce((a,b)=>revenueNet[b][5]>revenueNet[a][5]?b:a);
+
+  document.getElementById('kpi-revenue').innerHTML=`
+    <div class="stat-card"><div class="stat-val" style="color:var(--lav-t)">${fmtM(junTotal)}</div><div class="stat-lbl">รายได้รวม มิ.ย. (หลังหักส่วนลด)</div></div>
+    <div class="stat-card"><div class="stat-val ${isUp?'dn':'up'}">${isUp?'▲':'▼'} ${Math.abs(momPct)}%</div><div class="stat-lbl">เทียบ พ.ค. (MoM)</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#1A5A8A">${fmtM(ytdTotal)}</div><div class="stat-lbl">รวมสะสม ม.ค.–มิ.ย. (H1)</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:${BR_TEXT[topBr]}">${topBr}</div><div class="stat-lbl">รายได้สูงสุด มิ.ย. (${fmtM(revenueNet[topBr][5])})</div></div>
+  `;
+
+  new Chart(document.getElementById('c-rev-bar'),{
+    type:'bar',
+    data:{labels:MONTHS,datasets:BRANCHES.map(br=>({
+      label:br,data:revenueNet[br],backgroundColor:BR_BORDER[br],borderColor:BR_BORDER[br],borderWidth:1,stack:'rev'
+    }))},
+    options:{responsive:true,plugins:{legend:{position:'bottom'}},
+      scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1000)+'K':v}}}}
+  });
+
+  const tbody=document.getElementById('tbody-revenue');
+  let html=BRANCHES.map(br=>{
+    const vals=revenueNet[br];
+    const ytd=vals.reduce((s,v)=>s+v,0);
+    const pct=ytdTotal>0?((ytd/ytdTotal)*100).toFixed(1):0;
+    return `<tr>
+      <td><span class="pill br-${br}">${br} ${BR_NAMES[br]}</span></td>
+      ${vals.map(v=>`<td style="text-align:right">${fmtRaw(v)}</td>`).join('')}
+      <td style="text-align:right;font-weight:700">${fmtRaw(ytd)}</td>
+      <td style="text-align:right">${pct}%</td>
+    </tr>`;
+  }).join('');
+  html+=`<tr class="row-total">
+    <td><span class="pill br-Total">รวมทุกสาขา</span></td>
+    ${totals.map(v=>`<td style="text-align:right">${fmtRaw(v)}</td>`).join('')}
+    <td style="text-align:right;font-weight:700">${fmtRaw(ytdTotal)}</td>
+    <td style="text-align:right">100%</td>
+  </tr>`;
+  tbody.innerHTML=html;
+}
+
+function setDiscView(v){
+  document.getElementById('card-disc-actual').style.display=v==='actual'?'':'none';
+  document.getElementById('card-disc-budget').style.display=v==='budget'?'':'none';
+  document.getElementById('btn-disc-actual').classList.toggle('btn-active',v==='actual');
+  document.getElementById('btn-disc-budget').classList.toggle('btn-active',v==='budget');
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  initOverview();
+  renderBranchTab('DVRP');
+  renderShopTable();
+  initDiscount();
+  initRevenue();
+});
+</script>
+</body>
+</html>
